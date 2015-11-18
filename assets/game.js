@@ -13,13 +13,25 @@ window.onload = function() {
         document.getElementById('wsrl-avatar-display').appendChild(   Game.getDisplay('avatar').getContainer());
         document.getElementById('wsrl-main-display').appendChild(   Game.getDisplay('main').getContainer());
         document.getElementById('wsrl-message-display').appendChild(   Game.getDisplay('message').getContainer());
+
+        var bindEventToScreen = function(eventType) {
+            window.addEventListener(eventType, function(evt) {
+              Game.eventHandler(eventType, evt);
+            });
+        };
+        // Bind keyboard input events
+        bindEventToScreen('keydown');
+//        bindEventToScreen('keyup');
+        bindEventToScreen('keypress');
+
+        Game.switchUiMode(Game.UIMode.gameStart);
     }
 };
 
 var Game = {
 
-  DISPLAY_SPACING: 1.1,
-  display: {
+  _DISPLAY_SPACING: 1.1,
+  _display: {
     main: {
       w: 80,
       h: 24,
@@ -37,23 +49,25 @@ var Game = {
     }
   },
 
+  _curUiMode: null,
+
   init: function() {
     this._randomSeed = 5 + Math.floor(Math.random()*100000);
     //this._randomSeed = 76250;
     console.log("using random seed "+this._randomSeed);
     ROT.RNG.setSeed(this._randomSeed);
 
-    for (var display_key in this.display) {
-      if (this.display.hasOwnProperty(display_key)) {
-        this.display[display_key].o = new ROT.Display({width: this.display[display_key].w, height: this.display[display_key].h, spacing: Game.DISPLAY_SPACING});
+    for (var display_key in this._display) {
+      if (this._display.hasOwnProperty(display_key)) {
+        this._display[display_key].o = new ROT.Display({width: this._display[display_key].w, height: this._display[display_key].h, spacing: Game._DISPLAY_SPACING});
       }
     }
     this.renderDisplayAll();
   },
 
   getDisplay: function (displayId) {
-    if (this.display.hasOwnProperty(displayId)) {
-      return this.display[displayId].o;
+    if (this._display.hasOwnProperty(displayId)) {
+      return this._display[displayId].o;
     }
     return null;
   },
@@ -63,17 +77,44 @@ var Game = {
     this.renderDisplayMain();
     this.renderDisplayMessage();
   },
-  renderDisplayMain: function() {
-    var d = this.display.main.o;
-    d.drawText(1,1,"main display");
-  },
   renderDisplayAvatar: function() {
-    var d = this.display.avatar.o;
-    d.drawText(1,1,"avatar display");
+    this._display.avatar.o.clear();
+    if (this._curUiMode === null) {
+      return;
+    }
+    if (this._curUiMode.hasOwnProperty('renderAvatar')) {
+      this._curUiMode.renderAvatar(this._display.avatar.o);
+    }
+  },
+  renderDisplayMain: function() {
+    this._display.main.o.clear();
+    if (this._curUiMode === null) {
+      return;
+    }
+    if (this._curUiMode.hasOwnProperty('render')) {
+      this._curUiMode.render(this._display.main.o);
+    }
   },
   renderDisplayMessage: function() {
-    var d = this.display.message.o;
+    var d = this._display.message.o;
     d.drawText(1,1,"message display");
-  }
+  },
 
+  eventHandler: function (eventType, evt) {
+    // When an event is received have the current ui handle it
+    if (this._curUiMode !== null) {
+        this._curUiMode.handleInput(eventType, evt);
+    }
+  },
+
+  switchUiMode: function (newUiMode) {
+    if (this._curUiMode !== null) {
+      this._curUiMode.exit();
+    }
+    this._curUiMode = newUiMode;
+    if (this._curUiMode !== null) {
+      this._curUiMode.enter();
+    }
+    this.renderDisplayAll();
+  }
 };
