@@ -12,3 +12,4 @@ At this stage the beginnings of larger structures and strategies sketched out
 * using rich / complicated data structures (i.e. array, hashes/objects, functions, etc., all potentially nested multiple levels)
 * make significant use of the JS console in the development/debug process
 
+The next step is to flesh out the UI a bit - better display, more complex display and interaction management, and actually interacting with the user.
