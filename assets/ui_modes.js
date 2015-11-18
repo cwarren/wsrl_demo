@@ -6,6 +6,7 @@ Game.UIMode.DEFAULT_COLOR_STR = '%c{'+Game.UIMode.DEFAULT_COLOR_FG+'}%b{'+Game.U
 Game.UIMode.gameStart = {
   enter: function () {
     console.log('game starting');
+    Game.Message.send("Welcome to WSRL");
   },
   exit: function () {
   },
@@ -16,10 +17,14 @@ Game.UIMode.gameStart = {
     display.drawText(1,3,"press any key to play",fg,bg);
   },
   handleInput: function (inputType,inputData) {
-    console.log('gameStart inputType:');
-    console.dir(inputType);
-    console.log('gameStart inputData:');
-    console.dir(inputData);
+//    console.log('gameStart inputType:');
+//    console.dir(inputType);
+//    console.log('gameStart inputData:');
+  //  console.dir(inputData);
+    if (inputData.charCode !== 0) { // ignore the various modding keys - control, shift, etc.
+      Game.switchUiMode(Game.UIMode.gamePlay);
+      Game.Message.clear();
+    }
   }
 };
 
@@ -37,10 +42,11 @@ Game.UIMode.gamePlay = {
     display.drawText(1,4,"press [Esc] to lose",fg,bg);
   },
   handleInput: function (inputType,inputData) {
-    console.log('gamePlay inputType:');
-    console.dir(inputType);
-    console.log('gamePlay inputData:');
-    console.dir(inputData);
+    //    console.log('gameStart inputType:');
+    //    console.dir(inputType);
+    //    console.log('gameStart inputData:');
+    //    console.dir(inputData);
+    Game.Message.send("you pressed the '"+String.fromCharCode(inputData.charCode)+"' key");
   }
 };
 
@@ -56,10 +62,10 @@ Game.UIMode.gameWin = {
     display.drawText(1,1,"You WON!!!!",fg,bg);
   },
   handleInput: function (inputType,inputData) {
-    console.log('gameWin inputType:');
-    console.dir(inputType);
-    console.log('gameWin inputData:');
-    console.dir(inputData);
+    //    console.log('gameStart inputType:');
+    //    console.dir(inputType);
+    //    console.log('gameStart inputData:');
+    //    console.dir(inputData);
   }
 };
 
@@ -75,9 +81,9 @@ Game.UIMode.gameLose = {
     display.drawText(1,1,"You lost :(",fg,bg);
   },
   handleInput: function (inputType,inputData) {
-    console.log('gameLose inputType:');
-    console.dir(inputType);
-    console.log('gameLose inputData:');
-    console.dir(inputData);
+    //    console.log('gameStart inputType:');
+    //    console.dir(inputType);
+    //    console.log('gameStart inputData:');
+    //    console.dir(inputData);
   }
 };

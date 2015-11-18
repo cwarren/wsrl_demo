@@ -20,9 +20,9 @@ window.onload = function() {
             });
         };
         // Bind keyboard input events
+        bindEventToScreen('keypress');
         bindEventToScreen('keydown');
 //        bindEventToScreen('keyup');
-        bindEventToScreen('keypress');
 
         Game.switchUiMode(Game.UIMode.gameStart);
     }
@@ -72,6 +72,9 @@ var Game = {
     return null;
   },
 
+  refresh: function () {
+    this.renderDisplayAll();
+  },
   renderDisplayAll: function() {
     this.renderDisplayAvatar();
     this.renderDisplayMain();
@@ -96,14 +99,14 @@ var Game = {
     }
   },
   renderDisplayMessage: function() {
-    var d = this._display.message.o;
-    d.drawText(1,1,"message display");
+    Game.Message.render(this._display.message.o);
   },
 
   eventHandler: function (eventType, evt) {
     // When an event is received have the current ui handle it
     if (this._curUiMode !== null) {
         this._curUiMode.handleInput(eventType, evt);
+        Game.refresh();
     }
   },
 
