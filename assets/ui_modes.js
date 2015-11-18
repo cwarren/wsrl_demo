@@ -17,13 +17,12 @@ Game.UIMode.gameStart = {
     display.drawText(1,3,"press any key to play",fg,bg);
   },
   handleInput: function (inputType,inputData) {
-//    console.log('gameStart inputType:');
-//    console.dir(inputType);
-//    console.log('gameStart inputData:');
+  //  console.log('gameStart inputType:');
+  //  console.dir(inputType);
+  //  console.log('gameStart inputData:');
   //  console.dir(inputData);
     if (inputData.charCode !== 0) { // ignore the various modding keys - control, shift, etc.
       Game.switchUiMode(Game.UIMode.gamePlay);
-      Game.Message.clear();
     }
   }
 };
@@ -31,6 +30,7 @@ Game.UIMode.gameStart = {
 Game.UIMode.gamePlay = {
   enter: function () {
     console.log('game playing');
+    Game.Message.clear();
   },
   exit: function () {
   },
@@ -42,11 +42,21 @@ Game.UIMode.gamePlay = {
     display.drawText(1,4,"press [Esc] to lose",fg,bg);
   },
   handleInput: function (inputType,inputData) {
-    //    console.log('gameStart inputType:');
-    //    console.dir(inputType);
-    //    console.log('gameStart inputData:');
-    //    console.dir(inputData);
+    // console.log('gameStart inputType:');
+    // console.dir(inputType);
+    // console.log('gameStart inputData:');
+    // console.dir(inputData);
     Game.Message.send("you pressed the '"+String.fromCharCode(inputData.charCode)+"' key");
+    if (inputType == 'keypress') {
+      if (inputData.keyIdentifier == 'Enter') {
+        Game.switchUiMode(Game.UIMode.gameWin);
+      }
+    }
+    else if (inputType == 'keydown') {
+      if (inputData.keyCode == 27) {
+        Game.switchUiMode(Game.UIMode.gameLose);
+      }
+    }
   }
 };
 
@@ -62,10 +72,11 @@ Game.UIMode.gameWin = {
     display.drawText(1,1,"You WON!!!!",fg,bg);
   },
   handleInput: function (inputType,inputData) {
-    //    console.log('gameStart inputType:');
-    //    console.dir(inputType);
-    //    console.log('gameStart inputData:');
-    //    console.dir(inputData);
+    // console.log('gameStart inputType:');
+    // console.dir(inputType);
+    // console.log('gameStart inputData:');
+    // console.dir(inputData);
+    Game.Message.clear();
   }
 };
 
@@ -81,9 +92,10 @@ Game.UIMode.gameLose = {
     display.drawText(1,1,"You lost :(",fg,bg);
   },
   handleInput: function (inputType,inputData) {
-    //    console.log('gameStart inputType:');
-    //    console.dir(inputType);
-    //    console.log('gameStart inputData:');
-    //    console.dir(inputData);
+    // console.log('gameStart inputType:');
+    // console.dir(inputType);
+    // console.log('gameStart inputData:');
+    // console.dir(inputData);
+    Game.Message.clear();
   }
 };
