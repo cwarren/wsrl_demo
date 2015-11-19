@@ -1,0 +1,28 @@
+All projects, coding and otherwise, boil down to two fundamental questions- what should we do, and how should we do it? Learning computer programming is largely about the latter. Implementing a large project is as much or more about the former.
+
+------------
+
+Q: How do you eat an elephant?
+A: One bite at a time.
+Addendum: Which bites are taken when is key to success.
+
+------------
+
+With a (very) basic game in place it's time to start thinking more carefully about next steps. Very roughly and in no particular order, the major areas that will need to be developed are:
+- map creation and display (with view window and navigation)
+- persistence (save & restore games)
+- avatar on the map (presence and interaction)
+- advancement
+- items & inventory
+- the UI loop and timing
+- mobs on the map (presence and interaction)
+- equipment
+
+At pretty much any level of complexity it is easier to extend an existing solution than to implement a new solution. In general, one should tackle the hardest, lowest level challenges as early as possible in the development process so the initial implementation is when the project is as simple as possible. The above list covers, at a high level, all the pieces needed to grow WSRL from its current state into a real game. Each piece is a significant challenge and all need to be done eventually. How do we choose which to do first? Here are some metrics to consider:
+- what's the simplest project state at which the piece can first be implemented? (implement each piece as early as possible)
+- how much harder does a given piece being done make the initial implementation of other pieces? (do earlier the ones that cause the least difficulty for other pieces (in initial implementation of the other piece))
+- which pieces require other pieces to be in place first? (dependency chains - do first the pieces at the beginning of chains)
+- which one will be the most fun to implement? (more fun ones might want to be saved for later)
+- which one will be the most fun / important for players? (more fun / important ones might want to be done earlier)
+
+This evaluation process should be repeated after each piece is complete, and the list of pieces is not fixed either - we may decide some get tossed entirely, and we may come up with whole new ones to add to the list.
