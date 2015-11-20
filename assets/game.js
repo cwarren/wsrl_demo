@@ -49,13 +49,12 @@ var Game = {
     }
   },
 
+  _game: null,
   _curUiMode: null,
+  _randomSeed: 0,
 
   init: function() {
-    this._randomSeed = 5 + Math.floor(Math.random()*100000);
-    //this._randomSeed = 76250;
-    console.log("using random seed "+this._randomSeed);
-    ROT.RNG.setSeed(this._randomSeed);
+    this._game = this;
 
     for (var display_key in this._display) {
       if (this._display.hasOwnProperty(display_key)) {
@@ -63,6 +62,15 @@ var Game = {
       }
     }
     this.renderDisplayAll();
+  },
+
+  getRandomSeed: function () {
+    return this._randomSeed;
+  },
+  setRandomSeed: function (s) {
+    this._randomSeed = s;
+    console.log("using random seed "+this._randomSeed);
+    ROT.RNG.setSeed(this._randomSeed);
   },
 
   getDisplay: function (displayId) {
