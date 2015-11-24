@@ -29,6 +29,7 @@ window.onload = function() {
 };
 
 var Game = {
+  _PERSISTANCE_NAMESPACE: 'wsrlgame',
 
   _DISPLAY_SPACING: 1.1,
   _display: {
@@ -55,6 +56,8 @@ var Game = {
 
   init: function() {
     this._game = this;
+
+    Game.setRandomSeed(5 + Math.floor(ROT.RNG.getUniform()*100000));
 
     for (var display_key in this._display) {
       if (this._display.hasOwnProperty(display_key)) {
@@ -127,5 +130,10 @@ var Game = {
       this._curUiMode.enter();
     }
     this.renderDisplayAll();
+  },
+
+  toJSON: function() {
+    var json = {"_randomSeed":this._randomSeed};
+    return json;
   }
 };
