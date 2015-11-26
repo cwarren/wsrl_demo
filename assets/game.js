@@ -117,7 +117,6 @@ var Game = {
     // When an event is received have the current ui handle it
     if (this._curUiMode !== null) {
         this._curUiMode.handleInput(eventType, evt);
-        Game.refresh();
     }
   },
 

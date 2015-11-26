@@ -7,8 +7,10 @@ Game.UIMode.gameStart = {
   enter: function () {
     console.log('game starting');
     Game.Message.send("Welcome to WSRL");
+    Game.refresh();
   },
   exit: function () {
+    Game.refresh();
   },
   render: function (display) {
     var fg = Game.UIMode.DEFAULT_COLOR_FG;
@@ -29,9 +31,11 @@ Game.UIMode.gameStart = {
 
 Game.UIMode.gamePersistence = {
   enter: function () {
+    Game.refresh();
     console.log('game persistence');
   },
   exit: function () {
+    Game.refresh();
   },
   render: function (display) {
     var fg = Game.UIMode.DEFAULT_COLOR_FG;
@@ -65,17 +69,19 @@ Game.UIMode.gamePersistence = {
       var json_state_data = window.localStorage.getItem(Game._PERSISTANCE_NAMESPACE);
       var state_data = JSON.parse(json_state_data);
       Game.setRandomSeed(state_data._randomSeed);
+      Game.UIMode.gamePlay.setupPlay();
       Game.switchUiMode(Game.UIMode.gamePlay);
     }
   },
   newGame: function () {
     Game.setRandomSeed(5 + Math.floor(ROT.RNG.getUniform()*100000));
+    Game.UIMode.gamePlay.setupPlay();
     Game.switchUiMode(Game.UIMode.gamePlay);
   },
   localStorageAvailable: function () { // NOTE: see https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
   	try {
   		var x = '__storage_test__';
-  		window.localStorage.setItem(x, x);
+  		window.localStorage.setItem( x, x);
   		window.localStorage.removeItem(x);
   		return true;
   	}
@@ -87,36 +93,73 @@ Game.UIMode.gamePersistence = {
 };
 
 Game.UIMode.gamePlay = {
+  attr: {
+    _map: null
+  },
   enter: function () {
     console.log('game playing');
     Game.Message.clear();
+    Game.refresh();
   },
   exit: function () {
+    Game.refresh();
   },
   render: function (display) {
     var fg = Game.UIMode.DEFAULT_COLOR_FG;
     var bg = Game.UIMode.DEFAULT_COLOR_BG;
+    this.attr._map.renderOn(display);
     display.drawText(1,1,"game play",fg,bg);
     display.drawText(1,3,"press [Enter] to win",fg,bg);
     display.drawText(1,4,"press [Esc] to lose",fg,bg);
     display.drawText(1,5,"press = to save, restore, or start a new game",fg,bg);
   },
   handleInput: function (inputType,inputData) {
-    // console.log('gameStart inputType:');
-    // console.dir(inputType);
-    // console.log('gameStart inputData:');
-    // console.dir(inputData);
     Game.Message.send("you pressed the '"+String.fromCharCode(inputData.charCode)+"' key");
+    Game.renderDisplayMessage();
     if (inputType == 'keypress') {
+      // console.log('gameStart inputType:');
+      // console.dir(inputType);
+      // console.log('gameStart inputData:');
+      // console.dir(inputData);
       if (inputData.keyIdentifier == 'Enter') {
         Game.switchUiMode(Game.UIMode.gameWin);
       }
     }
     else if (inputType == 'keydown') {
-      if (inputData.keyCode == 27) {
+      // console.log('gameStart inputType:');
+      // console.dir(inputType);
+      // console.log('gameStart inputData:');
+      // console.dir(inputData);
+      if (inputData.keyCode == 27) { // 'Escape'
         Game.switchUiMode(Game.UIMode.gameLose);
       }
+      else if (inputData.keyCode == 187) { // '='
+        Game.switchUiMode(Game.UIMode.gamePersistence);
+      }
     }
+  },
+  setupPlay: function () {
+    var mapTiles = Game.util.init2DArray(80,24,Game.Tile.nullTile);
+    var generator = new ROT.Map.Cellular(80, 24);
+    generator.randomize(0.5);
+
+    // repeated cellular automata process
+    var totalIterations = 3;
+    for (var i = 0; i < totalIterations - 1; i++) {
+      generator.create();
+    }
+
+    // run again then update map
+    generator.create(function(x,y,v) {
+      if (v === 1) {
+        mapTiles[x][y] = Game.Tile.floorTile;
+      } else {
+        mapTiles[x][y] = Game.Tile.wallTile;
+      }
+    });
+
+    // create map from the tiles
+    this.attr._map =  new Game.Map(mapTiles);
   }
 };
 
