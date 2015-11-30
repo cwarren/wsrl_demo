@@ -35,17 +35,7 @@ Game.Map.prototype.renderOn = function (display,camX,camY) {
       if (tile.getName() == 'nullTile') {
         tile = Game.Tile.wallTile;
       }
-      var sym = tile.getSymbol();
-      // console.log("tile is "); // DEV
-      // console.dir(this.getTile(x+xStart, y+yStart));
-      // console.log("sym is "); // DEV
-      // console.dir(sym);
-      // console.log(sym.getChar());
-      // console.log(sym.getFg());
-      // console.log(sym.getBg());
-      // console.log('------------');
-      display.draw(x,y,sym.getChar(),sym.getFg(),sym.getBg());
-      //display.draw(x, y,' ','#fff','#000');
+      tile.getSymbol().draw(display,x,y);
     }
   }
 };

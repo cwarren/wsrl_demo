@@ -96,8 +96,8 @@ var Game = {
     if (this._curUiMode === null) {
       return;
     }
-    if (this._curUiMode.hasOwnProperty('renderAvatar')) {
-      this._curUiMode.renderAvatar(this._display.avatar.o);
+    if (this._curUiMode.hasOwnProperty('renderAvatarInfo')) {
+      this._curUiMode.renderAvatarInfo(this._display.avatar.o);
     }
   },
   renderDisplayMain: function() {
