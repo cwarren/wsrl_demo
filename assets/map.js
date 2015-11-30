@@ -21,11 +21,24 @@ Game.Map.prototype.getTile = function (x,y) {
   return this.attr._tiles[x][y] || Game.Tile.nullTile;
 };
 
-Game.Map.prototype.renderOn = function (display) {
-  for (var x = 0; x < this.getWidth(); x++) {
-    for (var y = 0; y < this.getHeight(); y++) {
-      // Fetch the glyph for the tile and render it to the screen
-      var sym = this.getTile(x, y).getSymbol();
+Game.Map.prototype.renderOn = function (display,camX,camY) {
+  // console.log("display is ");
+  // console.dir(display);
+  var dispW = display._options.width;
+  var dispH = display._options.height;
+  var xStart = camX-Math.round(dispW/2);
+  var yStart = camY-Math.round(dispH/2);
+  for (var x = 0; x < dispW; x++) {
+    for (var y = 0; y < dispH; y++) {
+      // Fetch the glyph for the tile and render it to the screen - sub in wall tiles for nullTiles / out-of-bounds
+      var tile = this.getTile(x+xStart, y+yStart);
+      if (tile.getName() == 'nullTile') {
+        tile = Game.Tile.wallTile;
+      }
+      var sym = tile.getSymbol();
+      // console.log("tile is "); // DEV
+      // console.dir(this.getTile(x+xStart, y+yStart));
+      // console.log("sym is "); // DEV
       // console.dir(sym);
       // console.log(sym.getChar());
       // console.log(sym.getFg());

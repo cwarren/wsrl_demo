@@ -94,7 +94,11 @@ Game.UIMode.gamePersistence = {
 
 Game.UIMode.gamePlay = {
   attr: {
-    _map: null
+    _map: null,
+    _mapWidth: 300,
+    _mapHeight: 200,
+    _cameraX: 100,
+    _cameraY: 100
   },
   enter: function () {
     console.log('game playing');
@@ -107,8 +111,8 @@ Game.UIMode.gamePlay = {
   render: function (display) {
     var fg = Game.UIMode.DEFAULT_COLOR_FG;
     var bg = Game.UIMode.DEFAULT_COLOR_BG;
-    this.attr._map.renderOn(display);
-    display.drawText(1,1,"game play",fg,bg);
+    this.attr._map.renderOn(display,this.attr._cameraX,this.attr._cameraY);
+    display.drawText(1,1,"game play",fg,bg); // DEV
     display.drawText(1,3,"press [Enter] to win",fg,bg);
     display.drawText(1,4,"press [Esc] to lose",fg,bg);
     display.drawText(1,5,"press = to save, restore, or start a new game",fg,bg);
@@ -139,8 +143,8 @@ Game.UIMode.gamePlay = {
     }
   },
   setupPlay: function () {
-    var mapTiles = Game.util.init2DArray(80,24,Game.Tile.nullTile);
-    var generator = new ROT.Map.Cellular(80, 24);
+    var mapTiles = Game.util.init2DArray(this.attr._mapWidth,this.attr._mapHeight,Game.Tile.nullTile);
+    var generator = new ROT.Map.Cellular(this.attr._mapWidth,this.attr._mapHeight);
     generator.randomize(0.5);
 
     // repeated cellular automata process
