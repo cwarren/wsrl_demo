@@ -117,17 +117,42 @@ Game.UIMode.gamePlay = {
     display.drawText(1,4,"press [Esc] to lose",fg,bg);
     display.drawText(1,5,"press = to save, restore, or start a new game",fg,bg);
   },
+  moveCamera: function (dx,dy) {
+    this.attr._cameraX = Math.min(Math.max(0,this.attr._cameraX + dx),this.attr._mapWidth);
+    this.attr._cameraY = Math.min(Math.max(0,this.attr._cameraY + dy),this.attr._mapHeight);
+  },
   handleInput: function (inputType,inputData) {
+    var pressedKey = String.fromCharCode(inputData.charCode);
     Game.Message.send("you pressed the '"+String.fromCharCode(inputData.charCode)+"' key");
     Game.renderDisplayMessage();
     if (inputType == 'keypress') {
-      // console.log('gameStart inputType:');
+      // console.log('gameStart inputType:'); // DEV
       // console.dir(inputType);
       // console.log('gameStart inputData:');
       // console.dir(inputData);
       if (inputData.keyIdentifier == 'Enter') {
         Game.switchUiMode(Game.UIMode.gameWin);
+        return;
+      } else if (pressedKey == '1') {
+        this.moveCamera(-1,1);
+      } else if (pressedKey == '2') {
+        this.moveCamera(0,1);
+      } else if (pressedKey == '3') {
+        this.moveCamera(1,1);
+      } else if (pressedKey == '4') {
+        this.moveCamera(-1,0);
+      } else if (pressedKey == '5') {
+        // do nothing / stay still
+      } else if (pressedKey == '6') {
+        this.moveCamera(1,0);
+      } else if (pressedKey == '7') {
+        this.moveCamera(-1,-1);
+      } else if (pressedKey == '8') {
+        this.moveCamera(0,-1);
+      } else if (pressedKey == '9') {
+        this.moveCamera(1,-1);
       }
+      Game.refresh();
     }
     else if (inputType == 'keydown') {
       // console.log('gameStart inputType:');
