@@ -8,24 +8,18 @@ Addendum: Which bites are taken when is key to success.
 
 ------------
 
-With a (very) basic game in place it's time to start thinking more carefully about next steps. Very roughly and in no particular order, the major areas that will need to be developed are:
-- map creation and display (with view window and navigation)
-- persistence (save & restore games)
-- avatar on the map (presence and interaction)
+Having handled a couple of items it's a good time to re-visit the task list - remove completed items, add new ones, and figure out priorities for next steps.
+- avatar interacts with the map (e.g. blocked by walls, can dig)
 - advancement
 - items & inventory
 - the UI loop and timing
 - mobs on the map (presence and interaction)
+- mobs in general
 - equipment
+- key binding system
+- help system (at the least, list available actions / commands)
+- random tables (ways of selecting at random from a weighted and possibly dynamic set)
 
-At pretty much any level of complexity it is easier to extend an existing solution than to implement a new solution. In general, one should tackle the hardest, lowest level challenges as early as possible in the development process so the initial implementation is when the project is as simple as possible. The above list covers, at a high level, all the pieces needed to grow WSRL from its current state into a real game. Each piece is a significant challenge and all need to be done eventually. How do we choose which to do first? Here are some metrics to consider:
-- what's the simplest project state at which the piece can first be implemented? (implement each piece as early as possible)
-- how much harder does a given piece being done make the initial implementation of other pieces? (do earlier the ones that cause the least difficulty for other pieces (in initial implementation of the other piece))
-- which pieces require other pieces to be in place first? (dependency chains - do first the pieces at the beginning of chains)
-- which one will be the most fun to implement? (more fun ones might want to be saved for later)
-- which one will be the most fun / important for players? (more fun / important ones might want to be done earlier)
+It's tempting to work on building a better map generation system, since that's a) fun and b) heavily impacts player experience. However, having a better map doesn't really help with any of the other tasks. Improving avatar-map interaction is a possibility. It's pretty easy to do at this level of complexity and it's key to play experience. Other mobs should also respect the map, so figuring that out for the avatar will help with mobs in general. Thinking about the avatar and mobs, ideally the avatar is just a special case of a mob which is controlled by the player rather than an AI. So, rather than implementing a bunch of avatar-map behavior stuff as free-floating code it would be better to put it in the more generalized context of mob behavior. To that end it would make sense to get basic mob stuff in place before special-casing a mob as the avatar.
 
-This evaluation process should be repeated after each piece is complete, and the list of pieces is not fixed either - we may decide some get tossed entirely, and we may come up with whole new ones to add to the list.
-
-
-For me, at this point, I think persistence is the piece to tackle next. All we need in place to implement it is a basic game state, which we have in the form of the random seed that's used - storing and retrieving a single number is probably the easiest situation we're going to get with regard to persistence implementation. Every other piece adds a big chink of game state to deal with, and having persistence in place doesn't make the initial implementation of any of the other pieces notably more difficult (though of course we'll have to extend the persistence piece to handle the new state that each other piece adds as it's implementented). Additionally, persistence will be important to the player (at least, for this game it will - one could certainly create a game that deliberately does not have persistence). Finally, I don't expect to have as much fun with it as with other pieces, so I should probably get it out of the way earlier and leave the fun parts as something to look forward to.
+Mobs have a symbol, a name, a place on the map, and an action controller/chooser (AI or player). Controller stuff is complicated, so that should probably be split into a separate task. Also, one very quickly gets into issues of timing. All the complexity revealed on deeper consideration is a sign that this is a good area to tackle while the game is at a very simple stage of its development.
