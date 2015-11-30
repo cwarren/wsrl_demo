@@ -69,7 +69,7 @@ Game.UIMode.gamePersistence = {
       var json_state_data = window.localStorage.getItem(Game._PERSISTANCE_NAMESPACE);
       var state_data = JSON.parse(json_state_data);
       Game.setRandomSeed(state_data._randomSeed);
-      Game.UIMode.gamePlay.setupPlay();
+      Game.UIMode.gamePlay.setupPlay(state_data);
       Game.switchUiMode(Game.UIMode.gamePlay);
     }
   },
@@ -102,6 +102,7 @@ Game.UIMode.gamePlay = {
     _avatarX: 100,
     _avatarY: 100
   },
+  JSON_KEY: 'uiMode_gamePlay',
   enter: function () {
     console.log('game playing');
     Game.Message.clear();
@@ -191,7 +192,7 @@ Game.UIMode.gamePlay = {
       }
     }
   },
-  setupPlay: function () {
+  setupPlay: function (restorationData) {
     var mapTiles = Game.util.init2DArray(this.attr._mapWidth,this.attr._mapHeight,Game.Tile.nullTile);
     var generator = new ROT.Map.Cellular(this.attr._mapWidth,this.attr._mapHeight);
     generator.randomize(0.5);
@@ -213,6 +214,27 @@ Game.UIMode.gamePlay = {
 
     // create map from the tiles
     this.attr._map =  new Game.Map(mapTiles);
+
+    // restore anything else if the data is available
+    if (restorationData !== undefined && restorationData.hasOwnProperty(Game.UIMode.gamePlay.JSON_KEY)) {
+      this.fromJSON(restorationData[Game.UIMode.gamePlay.JSON_KEY]);
+    }
+  },
+  toJSON: function() {
+    var json = {};
+    for (var at in this.attr) {
+      if (this.attr.hasOwnProperty(at) && at!='_map') {
+        json[at] = this.attr[at];
+      }
+    }
+    return json;
+  },
+  fromJSON: function (json) {
+    for (var at in this.attr) {
+      if (this.attr.hasOwnProperty(at) && at!='_map') {
+        this.attr[at] = json[at];
+      }
+    }
   }
 };
 
