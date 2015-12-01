@@ -12,12 +12,12 @@ Game.Entity = function(template) {
     // mixin sutff
     // track mixins and groups, copy over non-META properties, and run the mixin init if it exists
     this._mixinTracker = {};
-    console.dir(template);
-    console.dir(template.mixins);
+    // console.dir(template);
+    // console.dir(template.mixins);
     if (template.hasOwnProperty('mixins')) {
       for (var i = 0; i < template.mixins.length; i++) {
         var mixin = template.mixins[i];
-        console.dir(mixin);
+        // console.dir(mixin);
         this._mixinTracker[mixin.META.mixinName] = true;
         this._mixinTracker[mixin.META.mixinGroup] = true;
         for (var mixinProp in mixinProp != 'META' && mixin) {
