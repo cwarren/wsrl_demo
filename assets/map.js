@@ -43,6 +43,6 @@ Game.Map.prototype.renderOn = function (display,camX,camY) {
 Game.Map.prototype.toJSON = function () {
   // do nothing.... for now....
 };
-Game.Map.prototype.fromJSON = function () {
+Game.Map.prototype.fromJSON = function (json) {
   // do nothing.... for now....
 };
