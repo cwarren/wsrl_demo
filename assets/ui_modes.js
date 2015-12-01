@@ -89,6 +89,38 @@ Game.UIMode.gamePersistence = {
       Game.Message.send('Sorry, no local data storage is available for this browser');
   		return false;
   	}
+  },
+  BASE_toJSON: function(state_hash_name) {
+    var state = this.attr;
+    if (state_hash_name) {
+      state = this[state_hash_name];
+    }
+    var json = {};
+    for (var at in state) {
+      if (state.hasOwnProperty(at)) {
+        if (state[at] instanceof Object && 'toJSON' in state[at]) {
+          json[at] = state[at].toJSON();
+        } else {
+          json[at] = state[at];
+        }
+      }
+    }
+    return json;
+  },
+  BASE_fromJSON: function (json,state_hash_name) {
+    var using_state_hash = 'attr';
+    if (state_hash_name) {
+      using_state_hash = state_hash_name;
+    }
+    for (var at in this[using_state_hash]) {
+      if (this[using_state_hash].hasOwnProperty(at)) {
+        if (this[using_state_hash][at] instanceof Object && 'fromJSON' in this[using_state_hash][at]) {
+          this[using_state_hash][at].fromJSON(json[at]);
+        } else {
+          this[using_state_hash][at] = json[at];
+        }
+      }
+    }
   }
 };
 
@@ -225,28 +257,10 @@ Game.UIMode.gamePlay = {
     this.setCameraToAvatar();
   },
   toJSON: function() {
-    var json = {};
-    for (var at in this.attr) {
-      if (this.attr.hasOwnProperty(at)) {
-        if (this.attr[at] instanceof Object && 'toJSON' in this.attr[at]) {
-          json[at] = this.attr[at].toJSON();
-        } else {
-          json[at] = this.attr[at];
-        }
-      }
-    }
-    return json;
+    return Game.UIMode.gamePersistence.BASE_toJSON.call(this);
   },
   fromJSON: function (json) {
-    for (var at in this.attr) {
-      if (this.attr.hasOwnProperty(at)) {
-        if (this.attr[at] instanceof Object && 'fromJSON' in this.attr[at]) {
-          this.attr[at].fromJSON(json[at]);
-        } else {
-          this.attr[at] = json[at];
-        }
-      }
-    }
+    Game.UIMode.gamePersistence.BASE_fromJSON.call(this,json);
   }
 };
 
