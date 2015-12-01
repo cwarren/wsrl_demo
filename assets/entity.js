@@ -1,13 +1,35 @@
-Game.Entity = function(properties) {
-    properties = properties || {};
-    Game.Symbol.call(this, properties);
+Game.Entity = function(template) {
+    template = template || {};
+    Game.Symbol.call(this, template);
     if (! ('attr' in this)) { this.attr = {}; }
-    this.attr._name = properties.name || '';
-    this.attr._x = properties.x || 0;
-    this.attr._y = properties.y || 0;
+    this.attr._name = template.name || '';
+    this.attr._x = template.x || 0;
+    this.attr._y = template.y || 0;
 
     this._entityID = Game.util.randomString(32);
     Game.ALL_ENTITIES[this._entityID] = this;
+
+    // mixin sutff
+    // track mixins and groups, copy over non-META properties, and run the mixin init if it exists
+    this._mixinTracker = {};
+    console.dir(template);
+    console.dir(template.mixins);
+    if (template.hasOwnProperty('mixins')) {
+      for (var i = 0; i < template.mixins.length; i++) {
+        var mixin = template.mixins[i];
+        console.dir(mixin);
+        this._mixinTracker[mixin.META.mixinName] = true;
+        this._mixinTracker[mixin.META.mixinGroup] = true;
+        for (var mixinProp in mixinProp != 'META' && mixin) {
+          if (mixinProp != 'META' && mixin.hasOwnProperty(mixinProp)) {
+            this[mixinProp] = mixin[mixinProp];
+          }
+        }
+        if (mixin.META.hasOwnProperty('init')) {
+          mixin.META.init.call(this,template);
+        }
+      }
+    }
 };
 Game.Entity.extend(Game.Symbol);
 
