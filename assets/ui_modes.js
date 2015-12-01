@@ -247,11 +247,12 @@ Game.UIMode.gamePlay = {
     this.attr._map =  new Game.Map(mapTiles);
 
     this.attr._avatar = new Game.Entity(Game.EntityTemplates.Avatar);
-    this.attr._avatar.setPos(100,100);
 
     // restore anything else if the data is available
     if (restorationData !== undefined && restorationData.hasOwnProperty(Game.UIMode.gamePlay.JSON_KEY)) {
       this.fromJSON(restorationData[Game.UIMode.gamePlay.JSON_KEY]);
+    } else {
+      this.attr._avatar.setPos(this.attr._map.getRandomWalkableLocation());
     }
 
     this.setCameraToAvatar();

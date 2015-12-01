@@ -18,6 +18,11 @@ Game.util = {
       }
     }
     return a;
-  }
+  },
 
+  randomInt: function (min,max) {
+    var range = max - min;
+    var offset = Math.floor(ROT.RNG.getUniform()*(range+1));
+    return offset+min;
+  }
 };
