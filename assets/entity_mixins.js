@@ -1,6 +1,6 @@
 Game.EntityMixin = {};
 
-/* Mixins have a META property is is info about/for the mixin itself (usually just a name, group, and possibly an init function) and then all other properties. The META property is NOT copied into objects for which this mixin is used - all other properies ARE copied in */
+// Mixins have a META property is is info about/for the mixin itself and then all other properties. The META property is NOT copied into objects for which this mixin is used - all other properies ARE copied in.
 
 Game.EntityMixin.WalkerCorporeal = {
   META: {
@@ -24,19 +24,20 @@ Game.EntityMixin.WalkerCorporeal = {
 Game.EntityMixin.Chronicle = {
   META: {
     mixinName: 'Chronicle',
-    mixinGroup: 'Chronicle'
-  },
-  _Chronicle_attr: {
-    turnCounter: 0
+    mixinGroup: 'Chronicle',
+    stateNamespace: '_Chronicle_attr',
+    stateModel:  {
+      turnCounter: 0
+    }
   },
   trackTurn: function () {
-    this._Chronicle_attr.turnCounter++;
+    this.attr._Chronicle_attr.turnCounter++;
   },
   getTurns: function () {
-    return this._Chronicle_attr.turnCounter;
+    return this.attr._Chronicle_attr.turnCounter;
   },
   setTurns: function (n) {
-    this._Chronicle_attr.turnCounter = n;
+    this.attr._Chronicle_attr.turnCounter = n;
   }
 };
 
@@ -44,31 +45,32 @@ Game.EntityMixin.HitPoints = {
   META: {
     mixinName: 'HitPoints',
     mixinGroup: 'HitPoints',
+    stateNamespace: '_HitPoints_attr',
+    stateModel:  {
+      maxHp: 1,
+      curHp: 1
+    },
     init: function (template) {
-      this._HitPoints_attr.maxHp = template.maxHp || 1;
-      this._HitPoints_attr.curHp = template.curHp || this._HitPoints_attr.maxHp;
+      this.attr._HitPoints_attr.maxHp = template.maxHp || 1;
+      this.attr._HitPoints_attr.curHp = template.curHp || this.attr._HitPoints_attr.maxHp;
     }
   },
-  _HitPoints_attr: {
-    maxHp: 1,
-    curHp: 1
-  },
   getMaxHp: function () {
-    return this._HitPoints_attr.maxHp;
+    return this.attr._HitPoints_attr.maxHp;
   },
   setMaxHp: function (n) {
-    this._HitPoints_attr.maxHp = n;
+    this.attr._HitPoints_attr.maxHp = n;
   },
   getCurHp: function () {
-    return this._HitPoints_attr.curHp;
+    return this.attr._HitPoints_attr.curHp;
   },
   setCurHp: function (n) {
-    this._HitPoints_attr.curHp = n;
+    this.attr._HitPoints_attr.curHp = n;
   },
   takeHits: function (amt) {
-    this._HitPoints_attr.curHp -= amt;
+    this.attr._HitPoints_attr.curHp -= amt;
   },
   recoverHits: function (amt) {
-    this._HitPoints_attr.curHp = Math.min(this._HitPoints_attr.curHp+amt,this._HitPoints_attr.maxHp);
+    this.attr._HitPoints_attr.curHp = Math.min(this.attr._HitPoints_attr.curHp+amt,this.attr._HitPoints_attr.maxHp);
   }
 };

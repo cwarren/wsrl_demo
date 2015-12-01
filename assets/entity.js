@@ -26,6 +26,14 @@ Game.Entity = function(template) {
           this[mixinProp] = mixin[mixinProp];
         }
       }
+      if (mixin.META.hasOwnProperty('stateNamespace')) {
+        this.attr[mixin.META.stateNamespace] = {};
+        for (var mixinStateProp in mixin.META.stateModel) {
+          if (mixin.META.stateModel.hasOwnProperty(mixinStateProp)) {
+            this.attr[mixin.META.stateNamespace][mixinStateProp] = mixin.META.stateModel[mixinStateProp];
+          }
+        }
+      }
       if (mixin.META.hasOwnProperty('init')) {
         mixin.META.init.call(this,template);
       }
