@@ -9,7 +9,6 @@ Addendum: Which bites are taken when is key to success.
 ------------
 
 Having handled a couple of items it's a good time to re-visit the task list - remove completed items, add new ones, and figure out priorities for next steps.
-- avatar interacts with the map (e.g. blocked by walls, can dig)
 - advancement
 - items & inventory
 - the UI loop and timing
@@ -19,11 +18,23 @@ Having handled a couple of items it's a good time to re-visit the task list - re
 - key binding system
 - help system (at the least, list available actions / commands)
 - random tables (ways of selecting at random from a weighted and possibly dynamic set)
+- entity event system (entity mixins can raise events and have handlers for events that are raised)
+- entity repository (a way of organizing entity templates and getting entities generated from those templates)
+- improved map generation and management
 
-Now that at least one very basic mixin is working (WalkerCorporeal) it's time to handle mixins with state and how persistence is handled for them.
+Now that there's a system for entities I think it's time to add an entity other than the avatar. This entity will be extremely simple - no actions, it just sits there. Having more than one entity sets up work on:
+- map population
+- persistence
+- entity interaction (attacking / attack system)
+- entity death/removal
+- entity repository (a way of organizing entity templates and getting entities generated from those templates)
+Basically, the next milestone is to have the map populated with some kind of very simple mob that the avatar can kill.
 
-I'll create a very simple mixin called Chronicle which can be used to track information about an entity. For now it will simply track the number of moves the entity has made. This tracking will have to be called explicitly each time a move is made. Later I'll refactor this to use an event system instead - dealing with event stuff will require revisiting how mixins are added to an entity. However, for now I just need something that has enough state that I can figure out the persistence problem.
+In supporting that I might also tackle
+- entity event system (entity mixins can raise events and have handlers for events that are raised)
 
-Actually I'll probably need a couple of stateful mixins to really make sure it's working, and same with the event stuff. I also realized I need a mixin to test out mixin-specific template info. I'll set up a HitPoints mixin as well to cover both those issues.
+The UI loop needs to be in place before other entities can do anything - that's probably the next major milestone after this one, and will include some kind of mob that does something (i.e. VERY basic AI).
 
-This seems like a decent point to add some utility stuff to map as well - getting a random spot on the map, and getting a random spot of a given type and/or attribute (e.g. a random floor tile location). It'll be nice to launch the game and have the avatar not start out embedded in a wall.
+I think these also need to be handled fairly soon (partly to keep the screen uncluttered, and partly to have them in place before we start adding more commands), but probably not at this step
+- key binding system
+- help system
