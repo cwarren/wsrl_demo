@@ -23,11 +23,16 @@ Having handled a couple of items it's a good time to re-visit the task list - re
 - improved map generation and management
 
 Now that there's a system for entities I think it's time to add an entity other than the avatar. This entity will be extremely simple - no actions, it just sits there. Having more than one entity sets up work on:
-- map population
-- persistence
+DONE - map population
+*   NEXT - persistence for multiple entities
+*     There are a few big questions here: how to handle lots of entities in general? how to handle entity relationships to a map (and object relationships in general)? how to handle map persistence?
+*       + maybe use a local data store approach to manage all relationships? I.e. everything gets a unique id and the objects themselves are stored in a big hash, the all relationships (e.g. all the entities on a map, the map for each entity, etc.) are done by the id rather than the object itself. That would mean that relationships could safely be serialized without worrying about entire objects clogging things up.
+*       + maps might have to have their own RNG instance to ensure replicability....?
+*       + persistence is then handled by serializing all the state attributes of everything in the datastore rather than relying on hierarchical relations of game data structures
+*       I'm generally liking where this train of thought is headed.... worth trying it out....
 - entity interaction (attacking / attack system)
 - entity death/removal
-- entity repository (a way of organizing entity templates and getting entities generated from those templates)
+DONE - entity repository (a way of organizing entity templates and getting entities generated from those templates)
 Basically, the next milestone is to have the map populated with some kind of very simple mob that the avatar can kill.
 
 In supporting that I might also tackle
