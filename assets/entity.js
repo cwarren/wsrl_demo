@@ -1,3 +1,5 @@
+Game.ALL_ENTITIES = {}; // NOTE: consider putting this in the Entity namespace....?
+
 Game.Entity = function(template) {
     template = template || {};
     Game.Symbol.call(this, template);

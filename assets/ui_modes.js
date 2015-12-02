@@ -246,7 +246,7 @@ Game.UIMode.gamePlay = {
     // create map from the tiles
     this.attr._map =  new Game.Map(mapTiles);
 
-    this.attr._avatar = new Game.Entity(Game.EntityTemplates.Avatar);
+    this.attr._avatar = Game.EntityGenerator.create('avatar');
 
     // restore anything else if the data is available
     if (restorationData !== undefined && restorationData.hasOwnProperty(Game.UIMode.gamePlay.JSON_KEY)) {
