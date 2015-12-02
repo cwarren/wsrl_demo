@@ -146,16 +146,17 @@ Game.UIMode.gamePlay = {
     var fg = Game.UIMode.DEFAULT_COLOR_FG;
     var bg = Game.UIMode.DEFAULT_COLOR_BG;
     this.attr._map.renderOn(display,this.attr._cameraX,this.attr._cameraY);
-    display.drawText(1,1,"game play",fg,bg); // DEV
-    display.drawText(1,3,"press [Enter] to win",fg,bg);
-    display.drawText(1,4,"press [Esc] to lose",fg,bg);
-    display.drawText(1,5,"press = to save, restore, or start a new game",fg,bg);
-    this.renderAvatar(display);
+    // display.drawText(1,1,"game play",fg,bg); // DEV
+    // display.drawText(1,3,"press [Enter] to win",fg,bg);
+    // display.drawText(1,4,"press [Esc] to lose",fg,bg);
+    // display.drawText(1,5,"press = to save, restore, or start a new game",fg,bg);
+
+    //this.renderAvatar(display);
   },
-  renderAvatar: function (display) {
-    Game.Symbol.AVATAR.draw(display,this.attr._avatar.getX()-this.attr._cameraX+display._options.width/2,
-                                    this.attr._avatar.getY()-this.attr._cameraY+display._options.height/2);
-  },
+  // renderAvatar: function (display) {
+  //   Game.Symbol.AVATAR.draw(display,this.attr._avatar.getX()-this.attr._cameraX+display._options.width/2,
+  //                                   this.attr._avatar.getY()-this.attr._cameraY+display._options.height/2);
+  // },
   renderAvatarInfo: function (display) {
     var fg = Game.UIMode.DEFAULT_COLOR_FG;
     var bg = Game.UIMode.DEFAULT_COLOR_BG;
@@ -247,12 +248,20 @@ Game.UIMode.gamePlay = {
     this.attr._map =  new Game.Map(mapTiles);
 
     this.attr._avatar = Game.EntityGenerator.create('avatar');
-
+    this.attr._avatar.setMap(this.attr._map);
+    
     // restore anything else if the data is available
     if (restorationData !== undefined && restorationData.hasOwnProperty(Game.UIMode.gamePlay.JSON_KEY)) {
       this.fromJSON(restorationData[Game.UIMode.gamePlay.JSON_KEY]);
+      // TODO: restore all entities
+      this.attr._map.updateEntityLocation(this.attr._avatar);
     } else {
       this.attr._avatar.setPos(this.attr._map.getRandomWalkableLocation());
+      this.attr._map.updateEntityLocation(this.attr._avatar);
+      // dev code - just add some entities to the map
+      for (var ecount = 0; ecount < 80; ecount++) {
+        this.attr._map.addEntity(Game.EntityGenerator.create('moss'),this.attr._map.getRandomWalkableLocation());
+      }
     }
 
     this.setCameraToAvatar();

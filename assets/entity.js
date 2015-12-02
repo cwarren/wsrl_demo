@@ -11,16 +11,18 @@ Game.Entity = function(template) {
     this._entityID = Game.util.randomString(32);
     Game.ALL_ENTITIES[this._entityID] = this;
 
+    this._map = null;
+
     // mixin sutff
     // track mixins and groups, copy over non-META properties, and run the mixin init if it exists
     this._mixins = template.mixins || [];
     this._mixinTracker = {};
-    console.dir(template);
-    console.dir(template.mixins);
-    console.dir(this._mixins);
+    // console.dir(template);
+    // console.dir(template.mixins);
+    // console.dir(this._mixins);
     for (var i = 0; i < this._mixins.length; i++) {
       var mixin = this._mixins[i];
-      console.dir(mixin);
+      // console.dir(mixin);
       this._mixinTracker[mixin.META.mixinName] = true;
       this._mixinTracker[mixin.META.mixinGroup] = true;
       for (var mixinProp in mixinProp != 'META' && mixin) {
@@ -51,6 +53,17 @@ Game.Entity.prototype.hasMixin = function(checkThis) {
     }
 };
 
+Game.Entity.prototype.getId = function() {
+    return this._entityID;
+};
+
+Game.Entity.prototype.getMap = function() {
+    return this._map;
+};
+Game.Entity.prototype.setMap = function(map) {
+    this._map = map;
+};
+
 Game.Entity.prototype.getName = function() {
     return this.attr._name;
 };
@@ -65,6 +78,9 @@ Game.Entity.prototype.setPos = function(x_or_xy,y) {
     this.attr._x = x_or_xy;
     this.attr._y = y;
   }
+};
+Game.Entity.prototype.getPos = function () {
+  return {x:this.attr._x,y:this.attr._y};
 };
 Game.Entity.prototype.getX = function() {
     return this.attr._x;
