@@ -70,6 +70,21 @@ Game.Map.prototype.getEntity = function (x_or_pos,y) {
   return  false;
 };
 
+Game.Map.prototype.extractEntity = function (ent) {
+  this.attr._entitiesByLocation[ent.getX()+","+ent.getY()] = undefined;
+  this.attr._locationsByEntity[ent.getId()] = undefined;
+  return ent;
+};
+Game.Map.prototype.extractEntityAt = function (x_or_pos,y) {
+  var ent = this.getEntity(x_or_pos,y);
+  if (ent) {
+    this.attr._entitiesByLocation[ent.getX()+","+ent.getY()] = undefined;
+    this.attr._locationsByEntity[ent.getId()] = undefined;
+  }
+  return ent;
+};
+
+
 Game.Map.prototype.getRandomLocation = function(filter_func) {
   if (filter_func === undefined) {
     filter_func = function(tile) { return true; };

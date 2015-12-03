@@ -12,25 +12,23 @@ Having handled a couple of items it's a good time to re-visit the task list - re
 - advancement
 - items & inventory
 - the UI loop and timing
-- mobs on the map (interaction)
-- mobs in general
 - equipment
 - key binding system
 - help system (at the least, list available actions / commands)
 - random tables (ways of selecting at random from a weighted and possibly dynamic set)
-- entity event system (entity mixins can raise events and have handlers for events that are raised)
 - improved map generation
+- flesh out handling of messages to the player
 
 Turned out that getting persistence working for multiple entities entailed a lot of additional under-the-hood work, so that ended up becoming its own milestone. However, that means this next bit of work is nice and tightly focused on entity interaction (and communication)
-- entity interaction (attacking / attack system)
-- entity death/removal
-- entity event system (entity mixins can raise events and have handlers for events that are raised)
+DONE (new mixin) - entity interaction (attacking / attack system)
+DONE (entity.destroy, and map removal thereof) - entity death/removal
+DONE (whee!) - entity event system (entity mixins can raise events and have handlers for events that are raised)
     + really getting this working will require an entity that has two mixins that each have listeners for the same event; I'll have to set up at least one new entity mixin (may a spawn-on-death thing)
 The next milestone is to have the map populated with some kind of very simple mob that the avatar can kill. The is the same as it was for the previous step, but I expect to actually hit it this time.
 
 NOTE: at this stage I'm only handling inter-entity communication between two entities that are directly interacting with each other (i.e. the code knows about both of them at the same time). Anything more complex than that is waiting until a later milestone.
 
-The UI loop needs to be in place before other entities can do anything - that's probably the next major milestone after this one, and will include some kind of mob that does something (i.e. VERY basic AI).
+The UI loop needs to be in place before other entities can do anything - that's probably the next major milestone after this one, and will include some kind of mob that does something (i.e. VERY basic AI). However, might tackle keybinding and help first... we'll see....
 
 I think these also need to be handled fairly soon (partly to keep the screen uncluttered, and partly to have them in place before we start adding more commands), but probably not at this step
 - key binding system
