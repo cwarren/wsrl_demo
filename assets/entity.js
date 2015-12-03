@@ -1,4 +1,4 @@
-Game.ALL_ENTITIES = {}; // NOTE: consider putting this in the Entity namespace....?
+Game.DATASTORE.ENTITY = {};
 
 Game.Entity = function(template) {
     template = template || {};
@@ -7,9 +7,10 @@ Game.Entity = function(template) {
     this.attr._name = template.name || '';
     this.attr._x = template.x || 0;
     this.attr._y = template.y || 0;
+    this.attr._generator_template_key = template.generator_template_key || '';
 
-    this._entityID = Game.util.randomString(32);
-    Game.ALL_ENTITIES[this._entityID] = this;
+    this.attr._id = Game.util.randomString(32);
+    Game.DATASTORE.ENTITY[this.attr._id] = this;
 
     this._map = null;
 
@@ -54,7 +55,7 @@ Game.Entity.prototype.hasMixin = function(checkThis) {
 };
 
 Game.Entity.prototype.getId = function() {
-    return this._entityID;
+    return this.attr._id;
 };
 
 Game.Entity.prototype.getMap = function() {

@@ -5,7 +5,7 @@ Game.UIMode.DEFAULT_COLOR_STR = '%c{'+Game.UIMode.DEFAULT_COLOR_FG+'}%b{'+Game.U
 
 Game.UIMode.gameStart = {
   enter: function () {
-    console.log('game starting');
+    //console.log('game starting');
     Game.Message.send("Welcome to WSRL");
     Game.refresh();
   },
@@ -249,7 +249,7 @@ Game.UIMode.gamePlay = {
 
     this.attr._avatar = Game.EntityGenerator.create('avatar');
     this.attr._avatar.setMap(this.attr._map);
-    
+
     // restore anything else if the data is available
     if (restorationData !== undefined && restorationData.hasOwnProperty(Game.UIMode.gamePlay.JSON_KEY)) {
       this.fromJSON(restorationData[Game.UIMode.gamePlay.JSON_KEY]);

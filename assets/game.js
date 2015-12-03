@@ -1,7 +1,5 @@
-console.log("hello?");
-
 window.onload = function() {
-    console.log("starting WSRL - window loaded");
+    //console.log("starting WSRL - window loaded");
     // Check if rot.js can work on this browser
     if (!ROT.isSupported()) {
         alert("The rot.js library isn't supported by your browser.");
@@ -53,6 +51,8 @@ var Game = {
   _game: null,
   _curUiMode: null,
   _randomSeed: 0,
+
+  DATASTORE: {},
 
   init: function() {
     this._game = this;
