@@ -2,7 +2,7 @@ Game.DATASTORE.MAP = {};
 
 Game.Map = function (mapTileSetName) {
 
-  console.log("setting up new map using "+mapTileSetName+" tile set");
+  //console.log("setting up new map using "+mapTileSetName+" tile set");
 
   this._tiles = Game.MapTileSets[mapTileSetName].getMapTiles();
 

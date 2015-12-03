@@ -51,13 +51,15 @@ var Game = {
   _game: null,
   _curUiMode: null,
   _randomSeed: 0,
+  TRANSIENT_RNG: null,
 
   DATASTORE: {},
 
   init: function() {
     this._game = this;
 
-    Game.setRandomSeed(5 + Math.floor(ROT.RNG.getUniform()*100000));
+    this.TRANSIENT_RNG = ROT.RNG.clone();
+    Game.setRandomSeed(5 + Math.floor(this.TRANSIENT_RNG.getUniform()*100000));
 
     for (var display_key in this._display) {
       if (this._display.hasOwnProperty(display_key)) {
