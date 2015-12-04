@@ -22,11 +22,12 @@ Having handled a couple of items it's a good time to re-visit the task list - re
 I was going to take on key bindings or active mobs & UI loop, but I've just realized that I really should be the player message system straightened out before I go any further. The extremely simple visuals of a roguelike means that the messages to the player are one of the main ways that the player knows what's going on. Before I start on having more stuff going on I need to make sure than I can properly communicate with the player.
 
 Messaging has these main sub-components:
-- sending a message
-- displaying sent messages
-- hiding / no longer showing old messages
-- archiving hidden messages (and capping the archive size)
+DONE - sending a message
+DONE - displaying sent messages
+DONE - hiding / no longer showing old messages
+DONE - archiving hidden messages (and capping the archive size)
 - seeing archived messages
 - dealing with repeated messages
+- persist message stuff
 
 The first three points are the main ones on which I'll focus. Depending on how that goes I might try to get the other pieces done for this milestone as well.

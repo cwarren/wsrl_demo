@@ -246,6 +246,7 @@ Game.UIMode.gamePlay = {
         this.moveAvatar(-1,0);
       } else if (pressedKey == '5') {
         // do nothing / stay still
+        Game.renderDisplayMessage();
       } else if (pressedKey == '6') {
         this.moveAvatar(1,0);
       } else if (pressedKey == '7') {
@@ -255,6 +256,7 @@ Game.UIMode.gamePlay = {
       } else if (pressedKey == '9') {
         this.moveAvatar(1,-1);
       }
+      Game.Message.ageMessages();
     }
     else if (inputType == 'keydown') {
       // console.log('gameStart inputType:');
