@@ -11,7 +11,7 @@ Addendum: Which bites are taken when is key to success.
 Having handled a couple of items it's a good time to re-visit the task list - remove completed items, add new ones, and figure out priorities for next steps.
 - advancement
 - items & inventory
-- the UI loop and timing
+- the UI loop and timing and active mobs
 - equipment
 - key binding system
 - help system (at the least, list available actions / commands)
@@ -19,15 +19,23 @@ Having handled a couple of items it's a good time to re-visit the task list - re
 - improved map generation
 - flesh out handling of messages to the player
 
-I was going to take on key bindings or active mobs & UI loop, but I've just realized that I really should be the player message system straightened out before I go any further. The extremely simple visuals of a roguelike means that the messages to the player are one of the main ways that the player knows what's going on. Before I start on having more stuff going on I need to make sure than I can properly communicate with the player.
 
-Messaging has these main sub-components:
-DONE - sending a message
-DONE - displaying sent messages
-DONE - hiding / no longer showing old messages
-DONE - archiving hidden messages (and capping the archive size)
-- seeing archived messages
-- dealing with repeated messages
-DONE - persist message stuff
+Back to key bindings or active mobs & UI loop. Keybindings need to be handled at some point, but I think I can put them off until I actually need to support more commands - the next time I add a command (i.e. expand the handleInput function of UIMode.gamePlay) I'll do the keybinding work. Until then I'll work on things that more directly impact the gameplay experience, which in this case means active mobs, the ui loop, and timing.
 
-The first three points are the main ones on which I'll focus. Depending on how that goes I might try to get the other pieces done for this milestone as well.
+There are a number of ways to approach timing, which is to say, which entities get to act in what order. There's a decent summary of three popular approaches on Rogue Basin - http://www.roguebasin.com/index.php?title=Time_Systems. There's a lot of interesting work that can be done in the realm of designing and implementing schedulers (i.e. the system that determines the order in which entities get to take turns). However, rot.js includes a good scheduler already, which is what I'll use.
+
+I'm gong to jump directly to action-duration based scheduling. There are simpler options, but they're not enough simpler to make it worth while. In action-duration systems each action an entity does takes some amount of time, measured in 'ticks', 'game ticks', 'time chunks' or whatever name you want to use. One 'tick' is the shortest amount of time something in the game can take. The system has a queue of entities waiting to act. The front of the queue acts, and then rather than just being put at the end of the queue it's queue location is determined by how long the action takes in ticks - i.e. the queue is always sorted by ticks-until-next-action.
+
+We'll start by using the queue for entity actions, but this same system can be used for timing arbitrary things - e.g. the duration of a potion effect.
+
+-------------------
+
+The UI Loop is a core concept across pretty much all computer games. Essentially, the computer waits for player input, received input, processes input, possibly does other things, then goes back to waiting again. In real-time games this is an extremely tight loop, and other game-world actors are not blocked from acting while waiting for player input. In a turn-based game everything is paused while the player decides on their action.
+
+So, we need:
+1. a queue of things waiting to act
+2. a way for each thing that needs to act to do so on its turn
+3. a way to pause the loop when it's the players turn to act
+4. a way to put each thing back in the queue once it's acted (where in the queue depends on how long the the action took)
+
+Items 1, 4, and part of 2 are handled by the rot.js tools. 3 and the rest of 2 will be handled by entity mixins.
