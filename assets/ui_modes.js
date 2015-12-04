@@ -227,9 +227,8 @@ Game.UIMode.gamePlay = {
   },
   handleInput: function (inputType,inputData) {
     var pressedKey = String.fromCharCode(inputData.charCode);
-    Game.Message.send("you pressed the '"+String.fromCharCode(inputData.charCode)+"' key");
-    Game.renderDisplayMessage();
     if (inputType == 'keypress') {
+      Game.Message.send("you pressed the '"+String.fromCharCode(inputData.charCode)+"' key");
       // console.log('gameStart inputType:'); // DEV
       // console.dir(inputType);
       // console.log('gameStart inputData:');
