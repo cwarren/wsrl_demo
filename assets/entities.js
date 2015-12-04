@@ -5,7 +5,7 @@ Game.EntityGenerator.learn({
   chr:'@',
   fg:'#dda',
   maxHp: 10,
-  mixins: [Game.EntityMixin.WalkerCorporeal,Game.EntityMixin.HitPoints,Game.EntityMixin.Chronicle,Game.EntityMixin.MeleeAttacker]
+  mixins: [Game.EntityMixin.WalkerCorporeal,Game.EntityMixin.HitPoints,Game.EntityMixin.Chronicle,Game.EntityMixin.MeleeAttacker,Game.EntityMixin.PlayerMessager]
 });
 
 Game.EntityGenerator.learn({

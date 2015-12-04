@@ -2,6 +2,33 @@ Game.EntityMixin = {};
 
 // Mixins have a META property is is info about/for the mixin itself and then all other properties. The META property is NOT copied into objects for which this mixin is used - all other properies ARE copied in.
 
+Game.EntityMixin.PlayerMessager = {
+  META: {
+    mixinName: 'PlayerMessager',
+    mixinGroup: 'PlayerMessager',
+    listeners: {
+      'walkForbidden': function(evtData) {
+        Game.Message.send('you can\'t walk into the '+evtData.target.getName());
+        Game.renderDisplayMessage();
+      },
+      'dealtDamage': function(evtData) {
+        Game.Message.send('you hit the '+evtData.damagee.getName()+' for '+evtData.damageAmount);
+      },
+      'madeKill': function(evtData) {
+        Game.Message.send('you killed the '+evtData.entKilled.getName());
+      },
+      'damagedBy': function(evtData) {
+        Game.Message.send('the '+evtData.damager.getName()+' hit you for '+evtData.damageAmount);
+      },
+      'killed': function(evtData) {
+        Game.Message.send('you were killed by the '+evtData.killedBy.getName());
+        Game.renderDisplayMessage();
+      }
+    }
+  }
+//    Game.Message.send(msg);
+};
+
 Game.EntityMixin.WalkerCorporeal = {
   META: {
     mixinName: 'WalkerCorporeal',
@@ -16,7 +43,8 @@ Game.EntityMixin.WalkerCorporeal = {
       this.raiseEntityEvent('tookTurn');
       return true;
     }
-    if (map.getTile(targetX,targetY).isWalkable()) {
+    var targetTile = map.getTile(targetX,targetY);
+    if (targetTile.isWalkable()) {
       this.setPos(targetX,targetY);
       var myMap = this.getMap();
       if (myMap) {
@@ -24,6 +52,8 @@ Game.EntityMixin.WalkerCorporeal = {
       }
       this.raiseEntityEvent('tookTurn');
       return true;
+    } else {
+      this.raiseEntityEvent('walkForbidden',{target:targetTile});
     }
     return false;
   }
