@@ -50,13 +50,19 @@ Game.UIMode.gamePersistence = {
   //  console.dir(inputType);
   //  console.log('gameStart inputData:');
   //  console.dir(inputData);
-    var inputChar = String.fromCharCode(inputData.charCode);
-    if (inputChar == 'S') { // ignore the various modding keys - control, shift, etc.
-      this.saveGame();
-    } else if (inputChar == 'L') {
-      this.restoreGame();
-    } else if (inputChar == 'N') {
-      this.newGame();
+    if (inputType == 'keypress') {
+      var inputChar = String.fromCharCode(inputData.charCode);
+      if (inputChar == 'S') { // ignore the various modding keys - control, shift, etc.
+        this.saveGame();
+      } else if (inputChar == 'L') {
+        this.restoreGame();
+      } else if (inputChar == 'N') {
+        this.newGame();
+      }
+    } else if (inputType == 'keydown') {
+      if (inputData.keyCode == 27) { // 'Escape'
+        Game.switchUiMode(Game.UIMode.gamePlay);
+      }
     }
   },
   saveGame: function () {
@@ -167,7 +173,7 @@ Game.UIMode.gamePlay = {
   JSON_KEY: 'uiMode_gamePlay',
   enter: function () {
     //console.log('game playing');
-    Game.Message.clear();
+    //Game.Message.clear();
     if (this.attr._avatarId) {
       this.setCameraToAvatar();
     }
@@ -237,26 +243,33 @@ Game.UIMode.gamePlay = {
         Game.switchUiMode(Game.UIMode.gameWin);
         return;
       } else if (pressedKey == '1') {
+        Game.Message.ageMessages();
         this.moveAvatar(-1,1);
       } else if (pressedKey == '2') {
+        Game.Message.ageMessages();
         this.moveAvatar(0,1);
       } else if (pressedKey == '3') {
+        Game.Message.ageMessages();
         this.moveAvatar(1,1);
       } else if (pressedKey == '4') {
+        Game.Message.ageMessages();
         this.moveAvatar(-1,0);
       } else if (pressedKey == '5') {
         // do nothing / stay still
         Game.renderDisplayMessage();
       } else if (pressedKey == '6') {
+        Game.Message.ageMessages();
         this.moveAvatar(1,0);
       } else if (pressedKey == '7') {
+        Game.Message.ageMessages();
         this.moveAvatar(-1,-1);
       } else if (pressedKey == '8') {
+        Game.Message.ageMessages();
         this.moveAvatar(0,-1);
       } else if (pressedKey == '9') {
+        Game.Message.ageMessages();
         this.moveAvatar(1,-1);
       }
-      Game.Message.ageMessages();
     }
     else if (inputType == 'keydown') {
       // console.log('gameStart inputType:');
