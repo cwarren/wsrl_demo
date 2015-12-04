@@ -23,7 +23,7 @@ Game.Message = {
     }
   },
   ageMessages:function (lastStaleMessageIdx) {
-    console.log('age messages');
+    //console.log('age messages');
     // always archive the oldest stale message
     if (this.attr.staleMessagesQueue.length > 0) {
       this.attr.archivedMessagesQueue.unshift(this.attr.staleMessagesQueue.pop());

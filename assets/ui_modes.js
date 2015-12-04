@@ -68,6 +68,7 @@ Game.UIMode.gamePersistence = {
   saveGame: function () {
     if (this.localStorageAvailable()) {
       Game.DATASTORE.GAME_PLAY = Game.UIMode.gamePlay.attr;
+      Game.DATASTORE.MESSAGES = Game.Message.attr;
       window.localStorage.setItem(Game._PERSISTANCE_NAMESPACE, JSON.stringify(Game.DATASTORE));
       Game.switchUiMode(Game.UIMode.gamePlay);
     }
@@ -103,8 +104,9 @@ Game.UIMode.gamePersistence = {
         }
       }
 
-      // game play
+      // game play et al
       Game.UIMode.gamePlay.attr = state_data.GAME_PLAY;
+      Game.Message.attr = state_data.MESSAGES;
 
       Game.switchUiMode(Game.UIMode.gamePlay);
     }

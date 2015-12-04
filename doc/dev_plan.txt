@@ -28,6 +28,6 @@ DONE - hiding / no longer showing old messages
 DONE - archiving hidden messages (and capping the archive size)
 - seeing archived messages
 - dealing with repeated messages
-- persist message stuff
+DONE - persist message stuff
 
 The first three points are the main ones on which I'll focus. Depending on how that goes I might try to get the other pieces done for this milestone as well.
