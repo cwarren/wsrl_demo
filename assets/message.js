@@ -6,6 +6,7 @@ Game.Message = {
     archiveMessageLimit: 200
   },
   render: function (display) {
+    // console.log('render messages');
     //console.dir(this.attr);
     display.clear();
     var dispRowMax = display._options.height - 1;
@@ -23,7 +24,7 @@ Game.Message = {
     }
   },
   ageMessages:function (lastStaleMessageIdx) {
-    //console.log('age messages');
+    // console.log('age messages');
     // always archive the oldest stale message
     if (this.attr.staleMessagesQueue.length > 0) {
       this.attr.archivedMessagesQueue.unshift(this.attr.staleMessagesQueue.pop());
@@ -42,6 +43,7 @@ Game.Message = {
     }
   },
   send: function (msg) {
+    // console.log('send message '+msg);
     this.attr.freshMessagesReverseQueue.push(msg); // new messages get added to the end of the fresh message queue so that sequential things are in the right order (e.g. you hit the goblin, you kill the goblin)
   },
   clear: function () {

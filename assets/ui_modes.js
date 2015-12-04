@@ -180,9 +180,11 @@ Game.UIMode.gamePlay = {
       this.setCameraToAvatar();
     }
     Game.refresh();
+    Game.TimeEngine.unlock();
   },
   exit: function () {
     Game.refresh();
+    Game.TimeEngine.lock();
   },
   getMap: function () {
     return Game.DATASTORE.MAP[this.attr._mapId];
@@ -220,7 +222,9 @@ Game.UIMode.gamePlay = {
   moveAvatar: function (dx,dy) {
     if (this.getAvatar().tryWalk(this.getMap(),dx,dy)) {
       this.setCameraToAvatar();
+      return true;
     }
+    return false;
   },
   moveCamera: function (dx,dy) {
     this.setCamera(this.attr._cameraX + dx,this.attr._cameraY + dy);
@@ -228,49 +232,48 @@ Game.UIMode.gamePlay = {
   setCamera: function (sx,sy) {
     this.attr._cameraX = Math.min(Math.max(0,sx),this.getMap().getWidth());
     this.attr._cameraY = Math.min(Math.max(0,sy),this.getMap().getHeight());
-    Game.refresh();
+    Game.renderDisplayMain();
   },
   setCameraToAvatar: function () {
     this.setCamera(this.getAvatar().getX(),this.getAvatar().getY());
   },
   handleInput: function (inputType,inputData) {
-    var pressedKey = String.fromCharCode(inputData.charCode);
+    var tookTurn = false;
     if (inputType == 'keypress') {
-      // Game.Message.send("you pressed the '"+String.fromCharCode(inputData.charCode)+"' key"); // DEV
-      // console.log('gameStart inputType:'); // DEV
-      // console.dir(inputType);
-      // console.log('gameStart inputData:');
-      // console.dir(inputData);
+
+      // NOTE: a lot of repeated call below - think about where/how that might be done differently...?
+      var pressedKey = String.fromCharCode(inputData.charCode);
       if (inputData.keyIdentifier == 'Enter') {
         Game.switchUiMode(Game.UIMode.gameWin);
         return;
       } else if (pressedKey == '1') {
-        Game.Message.ageMessages();
-        this.moveAvatar(-1,1);
+        //Game.Message.ageMessages();
+        tookTurn = this.moveAvatar(-1,1);
       } else if (pressedKey == '2') {
-        Game.Message.ageMessages();
-        this.moveAvatar(0,1);
+        //Game.Message.ageMessages();
+        tookTurn = this.moveAvatar(0,1);
       } else if (pressedKey == '3') {
-        Game.Message.ageMessages();
-        this.moveAvatar(1,1);
+        // Game.Message.ageMessages();
+        tookTurn = this.moveAvatar(1,1);
       } else if (pressedKey == '4') {
-        Game.Message.ageMessages();
-        this.moveAvatar(-1,0);
+        // Game.Message.ageMessages();
+        tookTurn = this.moveAvatar(-1,0);
       } else if (pressedKey == '5') {
         // do nothing / stay still
-        Game.renderDisplayMessage();
+        tookTurn = true;
+        //Game.renderDisplayMessage();
       } else if (pressedKey == '6') {
-        Game.Message.ageMessages();
-        this.moveAvatar(1,0);
+        // Game.Message.ageMessages();
+        tookTurn = this.moveAvatar(1,0);
       } else if (pressedKey == '7') {
-        Game.Message.ageMessages();
-        this.moveAvatar(-1,-1);
+        // Game.Message.ageMessages();
+        tookTurn = this.moveAvatar(-1,-1);
       } else if (pressedKey == '8') {
-        Game.Message.ageMessages();
-        this.moveAvatar(0,-1);
+        // Game.Message.ageMessages();
+        tookTurn = this.moveAvatar(0,-1);
       } else if (pressedKey == '9') {
-        Game.Message.ageMessages();
-        this.moveAvatar(1,-1);
+        // Game.Message.ageMessages();
+        tookTurn = this.moveAvatar(1,-1);
       }
     }
     else if (inputType == 'keydown') {
@@ -284,6 +287,12 @@ Game.UIMode.gamePlay = {
       else if (inputData.keyCode == 187) { // '='
         Game.switchUiMode(Game.UIMode.gamePersistence);
       }
+    }
+
+    if (tookTurn) {
+      this.getAvatar().raiseEntityEvent('actionDone');
+      Game.Message.ageMessages();
+      return true;
     }
   },
   setupNewGame: function () {
