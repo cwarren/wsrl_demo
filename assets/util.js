@@ -24,5 +24,17 @@ Game.util = {
     var range = max - min;
     var offset = Math.floor(ROT.RNG.getUniform()*(range+1));
     return offset+min;
+  },
+
+  positionsAdjacentTo: function (pos) {
+    var adjPos = [];
+    for (var dx = -1; dx <= 1; dx++) {
+      for (var dy = -1; dy <= 1; dy++) {
+        if (dx !== 0 && dy !== 0) {
+          adjPos.push({x:pos.x+dx,y:pos.y+dy});
+        }
+      }
+    }
+    return adjPos;
   }
 };

@@ -78,6 +78,9 @@ Game.UIMode.gamePersistence = {
       var json_state_data = window.localStorage.getItem(Game._PERSISTANCE_NAMESPACE);
       var state_data = JSON.parse(json_state_data);
 
+      Game.DATASTORE = {};
+      Game.DATASTORE.MAP = {};
+      Game.DATASTORE.ENTITY = {};
       // console.log('state data: ');
       // console.dir(state_data);
 
@@ -95,12 +98,29 @@ Game.UIMode.gamePersistence = {
         }
       }
 
+      ROT.RNG.getUniform(); // once the map is regenerated cycle the RNG so we're getting new data for entity generation
+
+      // console.log('entity state data:');
+      // console.dir(JSON.parse(JSON.stringify(state_data.ENTITY)));
+
       // entities
       for (var entityId in state_data.ENTITY) {
         if (state_data.ENTITY.hasOwnProperty(entityId)) {
           var entAttr = JSON.parse(state_data.ENTITY[entityId]);
-          Game.DATASTORE.ENTITY[entityId] = Game.EntityGenerator.create(entAttr._generator_template_key);
+          // console.log('pre');
+          // console.dir(JSON.parse(JSON.stringify(Game.DATASTORE.ENTITY)));
+          var newE = Game.EntityGenerator.create(entAttr._generator_template_key);
+          // console.log('newE is '+newE.getId());
+          var idToPurge = newE.getId();
+          // console.dir(JSON.parse(JSON.stringify(newE.attr)));
+          Game.DATASTORE.ENTITY[entityId] = newE;
+          // console.log('mid');
+          // console.dir(JSON.parse(JSON.stringify(Game.DATASTORE.ENTITY)));
           Game.DATASTORE.ENTITY[entityId].fromJSON(state_data.ENTITY[entityId]);
+          Game.DATASTORE.ENTITY[idToPurge]=undefined;
+          // console.log('post');
+          // console.dir(JSON.parse(JSON.stringify(Game.DATASTORE.ENTITY)));
+          // console.log('-----------');
         }
       }
 
@@ -112,6 +132,9 @@ Game.UIMode.gamePersistence = {
     }
   },
   newGame: function () {
+    Game.DATASTORE = {};
+    Game.DATASTORE.MAP = {};
+    Game.DATASTORE.ENTITY = {};
     Game.setRandomSeed(5 + Math.floor(Game.TRANSIENT_RNG.getUniform()*100000));
     Game.UIMode.gamePlay.setupNewGame();
     Game.switchUiMode(Game.UIMode.gamePlay);
@@ -303,8 +326,9 @@ Game.UIMode.gamePlay = {
     this.setCameraToAvatar();
 
     // dev code - just add some entities to the map
-    for (var ecount = 0; ecount < 80; ecount++) {
+    for (var ecount = 0; ecount < 1; ecount++) {
       this.getMap().addEntity(Game.EntityGenerator.create('moss'),this.getMap().getRandomWalkableLocation());
+      this.getMap().addEntity(Game.EntityGenerator.create('newt'),this.getMap().getRandomWalkableLocation());
     }
 
   },

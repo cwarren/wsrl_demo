@@ -87,22 +87,31 @@ Game.EntityMixin.WalkerCorporeal = {
     mixinGroup: 'Walker'
   },
   tryWalk: function (map,dx,dy) {
-    var targetX = Math.min(Math.max(0,this.getX() + dx),map.getWidth());
-    var targetY = Math.min(Math.max(0,this.getY() + dy),map.getHeight());
+    var targetX = Math.min(Math.max(0,this.getX() + dx),map.getWidth()-1);
+    var targetY = Math.min(Math.max(0,this.getY() + dy),map.getHeight()-1);
+    console.log('tryWalk deltas: '+dx+','+dy+' '+this.getName());
+    console.log('tryWalk initial pos: '+this.getX()+','+this.getY()+' '+this.getName());
+    console.log('tryWalk: '+targetX+','+targetY+' '+this.getName());
+
     if (map.getEntity(targetX,targetY)) { // can't walk into spaces occupied by other entities
+      console.log('tryWalk - bump: '+this.getName());
       this.raiseEntityEvent('bumpEntity',{actor:this,recipient:map.getEntity(targetX,targetY)});
       // NOTE: should bumping an entity always take a turn? might have to get some return data from the event (once event return data is implemented)
       return true;
     }
     var targetTile = map.getTile(targetX,targetY);
     if (targetTile.isWalkable()) {
+      console.log('tryWalk - walkable: '+this.getName());
       this.setPos(targetX,targetY);
       var myMap = this.getMap();
       if (myMap) {
+        console.log('tryWalk - myMap.updateEntityLocation: '+this.getName());
         myMap.updateEntityLocation(this);
       }
+      console.log('tryWalk post movement pos: '+this.getX()+','+this.getY()+' '+this.getName());
       return true;
     } else {
+      console.log('tryWalk - walkForbidden: '+this.getName());
       this.raiseEntityEvent('walkForbidden',{target:targetTile});
     }
     return false;
@@ -237,11 +246,11 @@ Game.EntityMixin.MeleeAttacker = {
 //#############################################################################
 // ENTITY ACTORS / AI
 
-Game.EntityMixin.PeacefulWanderActor = {
+Game.EntityMixin.WanderActor = {
   META: {
-    mixinName: 'PeacefulWanderActor',
+    mixinName: 'WanderActor',
     mixinGroup: 'Actor',
-    stateNamespace: '_PeacefulWanderActor_attr',
+    stateNamespace: '_WanderActor_attr',
     stateModel:  {
       baseActionDuration: 1000,
       currentActionDuration: 1000
@@ -251,26 +260,29 @@ Game.EntityMixin.PeacefulWanderActor = {
     }
   },
   getBaseActionDuration: function () {
-    return this.attr._PlayerActor_attr.baseActionDuration;
+    return this.attr._WanderActor_attr.baseActionDuration;
   },
   setBaseActionDuration: function (n) {
-    this.attr._PlayerActor_attr.baseActionDuration = n;
+    this.attr._WanderActor_attr.baseActionDuration = n;
   },
   getCurrentActionDuration: function () {
-    return this.attr._PlayerActor_attr.currentActionDuration;
+    return this.attr._WanderActor_attr.currentActionDuration;
   },
   setCurrentActionDuration: function (n) {
-    this.attr._PlayerActor_attr.currentActionDuration = n;
+    this.attr._WanderActor_attr.currentActionDuration = n;
   },
-  getMoveCoord: function () {
-    console.log('TODO');
+  getMoveDeltas: function () {
+    return Game.util.positionsAdjacentTo({x:0,y:0}).random();
   },
   act: function () {
-    var moveTarget = this.getMoveCoord();
-    if (actor.hasMixin('Walker')) { // NOTE: this pattern suggests that maybe tryWalk shoudl be converted to an event
-      this.tryWalk(this.getMap(),moveTarget.x, moveTarget.y);
+    console.log('wander for '+this.getName());
+    var moveDeltas = this.getMoveDeltas();
+    if (this.hasMixin('Walker')) { // NOTE: this pattern suggests that maybe tryWalk shoudl be converted to an event
+      console.log('trying to walk to '+moveDeltas.x+','+moveDeltas.y);
+      this.tryWalk(this.getMap(),moveDeltas.x, moveDeltas.y);
     }
     Game.Scheduler.setDuration(this.getCurrentActionDuration());
     this.setCurrentActionDuration(this.getBaseActionDuration());
+    this.raiseEntityEvent('actionDone');
   }
 };
