@@ -44,7 +44,7 @@ Game.EntityMixin.Chronicle = {
         this.trackTurn();
       },
       'madeKill': function(evtData) {
-        console.log('chronicle kill');
+        // console.log('chronicle kill');
         this.addKill(evtData.entKilled);
       },
       'killed': function(evtData) {
@@ -69,7 +69,7 @@ Game.EntityMixin.Chronicle = {
   },
   addKill: function (entKilled) {
     var entName = entKilled.getName();
-    console.log('chronicle kill of '+entName);
+    // console.log('chronicle kill of '+entName);
     if (this.attr._Chronicle_attr.killLog[entName]) {
       this.attr._Chronicle_attr.killLog[entName]++;
     } else {
@@ -93,7 +93,7 @@ Game.EntityMixin.HitPoints = {
     },
     listeners: {
       'attacked': function(evtData) {
-        console.log('HitPoints attacked');
+        // console.log('HitPoints attacked');
 
         this.takeHits(evtData.attackPower);
         this.raiseEntityEvent('damagedBy',{damager:evtData.attacker,damageAmount:evtData.attackPower});
@@ -104,7 +104,7 @@ Game.EntityMixin.HitPoints = {
         }
       },
       'killed': function(evtData) {
-        console.log('HitPoints killed');
+        // console.log('HitPoints killed');
         this.destroy();
       }
     }
@@ -142,7 +142,7 @@ Game.EntityMixin.MeleeAttacker = {
     },
     listeners: {
       'bumpEntity': function(evtData) {
-        console.log('MeleeAttacker bumpEntity');
+        // console.log('MeleeAttacker bumpEntity');
         evtData.recipient.raiseEntityEvent('attacked',{attacker:evtData.actor,attackPower:this.getAttackPower()});
       }
     }
