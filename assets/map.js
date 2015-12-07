@@ -87,19 +87,21 @@ Game.Map.prototype.extractEntityAt = function (x_or_pos,y) {
 
 Game.Map.prototype.getRandomLocation = function(filter_func) {
   if (filter_func === undefined) {
-    filter_func = function(tile) { return true; };
+    filter_func = function(tile,tX,tY) { return true; };
   }
   var tX,tY,t;
   do {
     tX = Game.util.randomInt(0,this.attr._width - 1);
     tY = Game.util.randomInt(0,this.attr._height - 1);
     t = this.getTile(tX,tY);
-  } while (! filter_func(t));
+  } while (! filter_func(t,tX,tY));
   return {x:tX,y:tY};
 };
 
+// tile is walkable and unoccupied
 Game.Map.prototype.getRandomWalkableLocation = function() {
-  return this.getRandomLocation(function(t){ return t.isWalkable(); });
+  var map = this;
+  return this.getRandomLocation(function(t,tX,tY){ return t.isWalkable() && (!map.getEntity(tX,tY)); });
 };
 
 Game.Map.prototype.renderOn = function (display,camX,camY) {
