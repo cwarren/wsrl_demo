@@ -69,6 +69,15 @@ Game.UIMode.gamePersistence = {
     if (this.localStorageAvailable()) {
       Game.DATASTORE.GAME_PLAY = Game.UIMode.gamePlay.attr;
       Game.DATASTORE.MESSAGES = Game.Message.attr;
+
+      Game.DATASTORE.SCHEDULE = {};
+      // NOTE: offsetting times by 1 so later restore can just drop them in and go
+      Game.DATASTORE.SCHEDULE[Game.Scheduler._current.getId()] = 1;
+      for (var i = 0; i < Game.Scheduler._queue._eventTimes.length; i++) {
+        Game.DATASTORE.SCHEDULE[Game.Scheduler._queue._events[i].getId()] = Game.Scheduler._queue._eventTimes[i] + 1;
+      }
+      Game.DATASTORE.SCHEDULE_TIME = Game.Scheduler._queue.getTime() - 1; // offset by 1 so that when the engine is started after restore the queue state will match that as when it was saved
+
       window.localStorage.setItem(Game._PERSISTANCE_NAMESPACE, JSON.stringify(Game.DATASTORE));
       Game.switchUiMode(Game.UIMode.gamePlay);
     }
@@ -82,6 +91,7 @@ Game.UIMode.gamePersistence = {
       Game.DATASTORE.MAP = {};
       Game.DATASTORE.ENTITY = {};
       Game.initializeTimingEngine();
+      // NOTE: the timing stuff is initialized here because we need to ensure that the stuff exists when entities are created, but the actual schedule restoration re-runs timing initialization
 
       // game level stuff
       Game.setRandomSeed(state_data[this.RANDOM_SEED_KEY]);
@@ -90,8 +100,6 @@ Game.UIMode.gamePersistence = {
       for (var mapId in state_data.MAP) {
         if (state_data.MAP.hasOwnProperty(mapId)) {
           var mapAttr = JSON.parse(state_data.MAP[mapId]);
-          // console.log("restoring map "+mapId+" with attributes:");
-          // console.dir(mapAttr);
           Game.DATASTORE.MAP[mapId] = new Game.Map(mapAttr._mapTileSetName);
           Game.DATASTORE.MAP[mapId].fromJSON(state_data.MAP[mapId]);
         }
@@ -99,34 +107,31 @@ Game.UIMode.gamePersistence = {
 
       ROT.RNG.getUniform(); // once the map is regenerated cycle the RNG so we're getting new data for entity generation
 
-      // console.log('entity state data:');
-      // console.dir(JSON.parse(JSON.stringify(state_data.ENTITY)));
-
       // entities
       for (var entityId in state_data.ENTITY) {
         if (state_data.ENTITY.hasOwnProperty(entityId)) {
           var entAttr = JSON.parse(state_data.ENTITY[entityId]);
-          // console.dir(JSON.parse(JSON.stringify(entAttr)));
-          // console.log('pre');
-          // console.dir(JSON.parse(JSON.stringify(Game.DATASTORE.ENTITY)));
           var newE = Game.EntityGenerator.create(entAttr._generator_template_key,entAttr._id);
-          // console.log('newE is '+newE.getId());
-          // console.dir(JSON.parse(JSON.stringify(newE.attr)));
-
           Game.DATASTORE.ENTITY[entityId] = newE;
-          // console.log('mid');
-          // console.dir(JSON.parse(JSON.stringify(Game.DATASTORE.ENTITY)));
           Game.DATASTORE.ENTITY[entityId].fromJSON(state_data.ENTITY[entityId]);
-
-          // console.log('post');
-          // console.dir(JSON.parse(JSON.stringify(Game.DATASTORE.ENTITY)));
-          // console.log('-----------');
         }
       }
 
       // game play et al
       Game.UIMode.gamePlay.attr = state_data.GAME_PLAY;
       Game.Message.attr = state_data.MESSAGES;
+
+      // schedule
+      Game.initializeTimingEngine();
+      for (var schedItemId in state_data.SCHEDULE) {
+        if (state_data.SCHEDULE.hasOwnProperty(schedItemId)) {
+          // check here to determine which data store thing will be added to the scheduler (and the actual addition may vary - e.g. not everyting will be a repeatable thing)
+          if (Game.DATASTORE.ENTITY.hasOwnProperty(schedItemId)) {
+            Game.Scheduler.add(Game.DATASTORE.ENTITY[schedItemId],true,state_data.SCHEDULE[schedItemId]);
+          }
+        }
+      }
+      Game.Scheduler._queue._time = state_data.SCHEDULE_TIME;
 
       Game.switchUiMode(Game.UIMode.gamePlay);
     }
