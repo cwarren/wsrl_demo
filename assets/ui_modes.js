@@ -107,17 +107,18 @@ Game.UIMode.gamePersistence = {
       for (var entityId in state_data.ENTITY) {
         if (state_data.ENTITY.hasOwnProperty(entityId)) {
           var entAttr = JSON.parse(state_data.ENTITY[entityId]);
+          // console.dir(JSON.parse(JSON.stringify(entAttr)));
           // console.log('pre');
           // console.dir(JSON.parse(JSON.stringify(Game.DATASTORE.ENTITY)));
-          var newE = Game.EntityGenerator.create(entAttr._generator_template_key);
+          var newE = Game.EntityGenerator.create(entAttr._generator_template_key,entAttr._id);
           // console.log('newE is '+newE.getId());
-          var idToPurge = newE.getId();
           // console.dir(JSON.parse(JSON.stringify(newE.attr)));
+
           Game.DATASTORE.ENTITY[entityId] = newE;
           // console.log('mid');
           // console.dir(JSON.parse(JSON.stringify(Game.DATASTORE.ENTITY)));
           Game.DATASTORE.ENTITY[entityId].fromJSON(state_data.ENTITY[entityId]);
-          Game.DATASTORE.ENTITY[idToPurge]=undefined;
+
           // console.log('post');
           // console.dir(JSON.parse(JSON.stringify(Game.DATASTORE.ENTITY)));
           // console.log('-----------');

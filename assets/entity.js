@@ -2,6 +2,8 @@ Game.DATASTORE.ENTITY = {};
 
 Game.Entity = function(template) {
     template = template || {};
+    console.log("creating entity using template");
+    console.dir(template);
     Game.Symbol.call(this, template);
     if (! ('attr' in this)) { this.attr = {}; }
     this.attr._name = template.name || '';
@@ -10,23 +12,27 @@ Game.Entity = function(template) {
     this.attr._generator_template_key = template.generator_template_key || '';
     this.attr._mapId = null;
 
-    this.attr._id = Game.util.randomString(32);
+    this.attr._id = template.presetId || Game.util.randomString(32);
     Game.DATASTORE.ENTITY[this.attr._id] = this;
-
 
     // mixin sutff
     // track mixins and groups, copy over non-META properties, and run the mixin init if it exists
-    this._mixins = template.mixins || [];
+    this._mixinNames = template.mixins || [];
+    this._mixins = [];
+    for (var i = 0; i < this._mixinNames.length; i++) {
+      this._mixins.push(Game.EntityMixin[this._mixinNames[i]]);
+    }
     this._mixinTracker = {};
     // console.dir(template);
     // console.dir(template.mixins);
     // console.dir(this._mixins);
-    for (var i = 0; i < this._mixins.length; i++) {
-      var mixin = this._mixins[i];
+    for (var mi = 0; mi < this._mixins.length; mi++) {
+      var mixin = this._mixins[mi];
       // console.dir(mixin);
       this._mixinTracker[mixin.META.mixinName] = true;
       this._mixinTracker[mixin.META.mixinGroup] = true;
       for (var mixinProp in mixin) {
+        // console.log("checking mixin prop "+mixinProp);
         if (mixinProp != 'META' && mixin.hasOwnProperty(mixinProp)) {
           this[mixinProp] = mixin[mixinProp];
         }

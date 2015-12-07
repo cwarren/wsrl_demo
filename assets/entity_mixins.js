@@ -51,6 +51,7 @@ Game.EntityMixin.PlayerActor = {
         Game.Scheduler.setDuration(this.getCurrentActionDuration());
         this.setCurrentActionDuration(this.getBaseActionDuration());
         Game.TimeEngine.unlock();
+        console.log("end player acting");
       }
     }
   },
@@ -75,6 +76,7 @@ Game.EntityMixin.PlayerActor = {
   act: function () {
     if (this.isActing()) { return; } // a gate to deal with JS timing issues
     this.isActing(true);
+    console.log("begin player acting");
     Game.refresh();
     Game.TimeEngine.lock();
     this.isActing(false);
@@ -275,6 +277,7 @@ Game.EntityMixin.WanderActor = {
     return Game.util.positionsAdjacentTo({x:0,y:0}).random();
   },
   act: function () {
+    console.log("begin wander acting");
     console.log('wander for '+this.getName());
     var moveDeltas = this.getMoveDeltas();
     if (this.hasMixin('Walker')) { // NOTE: this pattern suggests that maybe tryWalk shoudl be converted to an event
@@ -284,5 +287,6 @@ Game.EntityMixin.WanderActor = {
     Game.Scheduler.setDuration(this.getCurrentActionDuration());
     this.setCurrentActionDuration(this.getBaseActionDuration());
     this.raiseEntityEvent('actionDone');
+    console.log("end wander acting");
   }
 };
