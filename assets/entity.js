@@ -2,8 +2,8 @@ Game.DATASTORE.ENTITY = {};
 
 Game.Entity = function(template) {
     template = template || {};
-    console.log("creating entity using template");
-    console.dir(template);
+    // console.log("creating entity using template");
+    // console.dir(template);
     Game.Symbol.call(this, template);
     if (! ('attr' in this)) { this.attr = {}; }
     this.attr._name = template.name || '';

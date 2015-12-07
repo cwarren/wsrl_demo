@@ -44,14 +44,14 @@ Game.EntityMixin.PlayerActor = {
       currentActionDuration: 1000
     },
     init: function (template) {
-      Game.Scheduler.add(this,true, this.getBaseActionDuration());
+      Game.Scheduler.add(this,true,1);
     },
     listeners: {
       'actionDone': function(evtData) {
         Game.Scheduler.setDuration(this.getCurrentActionDuration());
         this.setCurrentActionDuration(this.getBaseActionDuration());
-        Game.TimeEngine.unlock();
-        console.log("end player acting");
+        setTimeout(function() {Game.TimeEngine.unlock();},1); // NOTE: this tiny delay ensures console output happens in the right order, which in turn means I have confidence in the turn-taking order of the various entities
+        // console.log("end player acting");
       }
     }
   },
@@ -74,11 +74,13 @@ Game.EntityMixin.PlayerActor = {
     return this.attr._PlayerActor_attr.actingState;
   },
   act: function () {
+    // console.log("begin player acting");
+    // console.log("player pre-lock engine lock state is "+Game.TimeEngine._lock);
     if (this.isActing()) { return; } // a gate to deal with JS timing issues
     this.isActing(true);
-    console.log("begin player acting");
     Game.refresh();
     Game.TimeEngine.lock();
+    // console.log("player post-lock engine lock state is "+Game.TimeEngine._lock);
     this.isActing(false);
   }
 };
@@ -91,29 +93,29 @@ Game.EntityMixin.WalkerCorporeal = {
   tryWalk: function (map,dx,dy) {
     var targetX = Math.min(Math.max(0,this.getX() + dx),map.getWidth()-1);
     var targetY = Math.min(Math.max(0,this.getY() + dy),map.getHeight()-1);
-    console.log('tryWalk deltas: '+dx+','+dy+' '+this.getName());
-    console.log('tryWalk initial pos: '+this.getX()+','+this.getY()+' '+this.getName());
-    console.log('tryWalk: '+targetX+','+targetY+' '+this.getName());
+    // console.log('tryWalk deltas: '+dx+','+dy+' '+this.getName());
+    // console.log('tryWalk initial pos: '+this.getX()+','+this.getY()+' '+this.getName());
+    // console.log('tryWalk: '+targetX+','+targetY+' '+this.getName());
 
     if (map.getEntity(targetX,targetY)) { // can't walk into spaces occupied by other entities
-      console.log('tryWalk - bump: '+this.getName());
+      // console.log('tryWalk - bump: '+this.getName());
       this.raiseEntityEvent('bumpEntity',{actor:this,recipient:map.getEntity(targetX,targetY)});
       // NOTE: should bumping an entity always take a turn? might have to get some return data from the event (once event return data is implemented)
       return true;
     }
     var targetTile = map.getTile(targetX,targetY);
     if (targetTile.isWalkable()) {
-      console.log('tryWalk - walkable: '+this.getName());
+      // console.log('tryWalk - walkable: '+this.getName());
       this.setPos(targetX,targetY);
       var myMap = this.getMap();
       if (myMap) {
-        console.log('tryWalk - myMap.updateEntityLocation: '+this.getName());
+        // console.log('tryWalk - myMap.updateEntityLocation: '+this.getName());
         myMap.updateEntityLocation(this);
       }
-      console.log('tryWalk post movement pos: '+this.getX()+','+this.getY()+' '+this.getName());
+      // console.log('tryWalk post movement pos: '+this.getX()+','+this.getY()+' '+this.getName());
       return true;
     } else {
-      console.log('tryWalk - walkForbidden: '+this.getName());
+      // console.log('tryWalk - walkForbidden: '+this.getName());
       this.raiseEntityEvent('walkForbidden',{target:targetTile});
     }
     return false;
@@ -258,7 +260,7 @@ Game.EntityMixin.WanderActor = {
       currentActionDuration: 1000
     },
     init: function (template) {
-      Game.Scheduler.add(this,true, this.getBaseActionDuration());
+      Game.Scheduler.add(this,true, Game.util.randomInt(2,this.getBaseActionDuration()));
     }
   },
   getBaseActionDuration: function () {
@@ -277,16 +279,18 @@ Game.EntityMixin.WanderActor = {
     return Game.util.positionsAdjacentTo({x:0,y:0}).random();
   },
   act: function () {
-    console.log("begin wander acting");
-    console.log('wander for '+this.getName());
+    Game.TimeEngine.lock();
+    // console.log("begin wander acting");
+    // console.log('wander for '+this.getName());
     var moveDeltas = this.getMoveDeltas();
     if (this.hasMixin('Walker')) { // NOTE: this pattern suggests that maybe tryWalk shoudl be converted to an event
-      console.log('trying to walk to '+moveDeltas.x+','+moveDeltas.y);
-      this.tryWalk(this.getMap(),moveDeltas.x, moveDeltas.y);
+      // console.log('trying to walk to '+moveDeltas.x+','+moveDeltas.y);
+      this.tryWalk(this.getMap(), moveDeltas.x, moveDeltas.y);
     }
     Game.Scheduler.setDuration(this.getCurrentActionDuration());
     this.setCurrentActionDuration(this.getBaseActionDuration());
     this.raiseEntityEvent('actionDone');
-    console.log("end wander acting");
+    // console.log("end wander acting");
+    Game.TimeEngine.unlock();
   }
 };
