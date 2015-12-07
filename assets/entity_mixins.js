@@ -49,7 +49,7 @@ Game.EntityMixin.PlayerActor = {
     listeners: {
       'actionDone': function(evtData) {
         Game.Scheduler.setDuration(this.getCurrentActionDuration());
-        this.setCurrentActionDuration(this.getBaseActionDuration());
+        this.setCurrentActionDuration(this.getBaseActionDuration()+Game.util.randomInt(-5,5));
         setTimeout(function() {Game.TimeEngine.unlock();},1); // NOTE: this tiny delay ensures console output happens in the right order, which in turn means I have confidence in the turn-taking order of the various entities
         // console.log("end player acting");
       }
@@ -288,7 +288,7 @@ Game.EntityMixin.WanderActor = {
       this.tryWalk(this.getMap(), moveDeltas.x, moveDeltas.y);
     }
     Game.Scheduler.setDuration(this.getCurrentActionDuration());
-    this.setCurrentActionDuration(this.getBaseActionDuration());
+    this.setCurrentActionDuration(this.getBaseActionDuration()+Game.util.randomInt(-10,10));
     this.raiseEntityEvent('actionDone');
     // console.log("end wander acting");
     Game.TimeEngine.unlock();

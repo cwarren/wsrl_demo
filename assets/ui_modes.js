@@ -135,7 +135,7 @@ Game.UIMode.gamePersistence = {
     Game.DATASTORE = {};
     Game.DATASTORE.MAP = {};
     Game.DATASTORE.ENTITY = {};
-    Game.initializeTimingEngine();    
+    Game.initializeTimingEngine();
     Game.setRandomSeed(5 + Math.floor(Game.TRANSIENT_RNG.getUniform()*100000));
     Game.UIMode.gamePlay.setupNewGame();
     Game.switchUiMode(Game.UIMode.gamePlay);
@@ -329,7 +329,7 @@ Game.UIMode.gamePlay = {
     this.setCameraToAvatar();
 
     // dev code - just add some entities to the map
-    for (var ecount = 0; ecount < 1; ecount++) {
+    for (var ecount = 0; ecount < 5; ecount++) {
       this.getMap().addEntity(Game.EntityGenerator.create('moss'),this.getMap().getRandomWalkableLocation());
       this.getMap().addEntity(Game.EntityGenerator.create('newt'),this.getMap().getRandomWalkableLocation());
     }
