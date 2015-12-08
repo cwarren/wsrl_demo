@@ -46,6 +46,28 @@ Game.UIMode.gamePersistence = {
 //    console.log('TODO: check whether a game is in progress before offering restore');
   },
   handleInput: function (inputType,inputData) {
+    // console.log(inputType);
+    // console.dir(inputData);
+    var actionBinding = Game.KeyBinding.getInputBinding(inputType,inputData);
+    // console.log('action binding is');
+    // console.dir(actionBinding);
+    // console.log('----------');
+    if (! actionBinding) {
+      return false;
+    }
+
+    if        (actionBinding.actionKey == 'PERSISTENCE_SAVE') {
+      this.saveGame();
+    } else if (actionBinding.actionKey == 'PERSISTENCE_LOAD') {
+      this.restoreGame();
+    } else if (actionBinding.actionKey == 'PERSISTENCE_NEW') {
+      this.newGame();
+    } else if (actionBinding.actionKey == 'CANCEL') {
+      Game.switchUiMode(Game.UIMode.gamePlay);
+    }
+    return false;
+
+/*
   //  console.log('gameStart inputType:');
   //  console.dir(inputType);
   //  console.log('gameStart inputData:');
@@ -64,6 +86,7 @@ Game.UIMode.gamePersistence = {
         Game.switchUiMode(Game.UIMode.gamePlay);
       }
     }
+    */
   },
   saveGame: function () {
     if (this.localStorageAvailable()) {
@@ -79,6 +102,7 @@ Game.UIMode.gamePersistence = {
       Game.DATASTORE.SCHEDULE_TIME = Game.Scheduler._queue.getTime() - 1; // offset by 1 so that when the engine is started after restore the queue state will match that as when it was saved
 
       window.localStorage.setItem(Game._PERSISTANCE_NAMESPACE, JSON.stringify(Game.DATASTORE));
+      Game.Message.send('game saved');
       Game.switchUiMode(Game.UIMode.gamePlay);
     }
   },
@@ -133,6 +157,7 @@ Game.UIMode.gamePersistence = {
       }
       Game.Scheduler._queue._time = state_data.SCHEDULE_TIME;
 
+      Game.Message.send('game loaded');
       Game.switchUiMode(Game.UIMode.gamePlay);
     }
   },
@@ -143,6 +168,7 @@ Game.UIMode.gamePersistence = {
     Game.initializeTimingEngine();
     Game.setRandomSeed(5 + Math.floor(Game.TRANSIENT_RNG.getUniform()*100000));
     Game.UIMode.gamePlay.setupNewGame();
+    Game.Message.send('new game started');
     Game.switchUiMode(Game.UIMode.gamePlay);
   },
   localStorageAvailable: function () { // NOTE: see https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
@@ -269,7 +295,44 @@ Game.UIMode.gamePlay = {
     this.setCamera(this.getAvatar().getX(),this.getAvatar().getY());
   },
   handleInput: function (inputType,inputData) {
+    // console.log(inputType);
+    // console.dir(inputData);
+    var actionBinding = Game.KeyBinding.getInputBinding(inputType,inputData);
+    // console.log('action binding is');
+    // console.dir(actionBinding);
+    // console.log('----------');
+    if (! actionBinding) {
+      return false;
+    }
+
     var tookTurn = false;
+    if        (actionBinding.actionKey == 'MOVE_UL') {
+      tookTurn = this.moveAvatar(-1 ,-1);
+    } else if (actionBinding.actionKey == 'MOVE_U') {
+      tookTurn = this.moveAvatar(0  ,-1);
+    } else if (actionBinding.actionKey == 'MOVE_UR') {
+      tookTurn = this.moveAvatar(1  ,-1);
+    } else if (actionBinding.actionKey == 'MOVE_L') {
+      tookTurn = this.moveAvatar(-1  ,0);
+    } else if (actionBinding.actionKey == 'MOVE_WAIT') {
+      tookTurn = true;
+    } else if (actionBinding.actionKey == 'MOVE_R') {
+      tookTurn = this.moveAvatar(1  , 0);
+    } else if (actionBinding.actionKey == 'MOVE_DL') {
+      tookTurn = this.moveAvatar(-1  , 1);
+    } else if (actionBinding.actionKey == 'MOVE_D') {
+      tookTurn = this.moveAvatar(0  , 1);
+    } else if (actionBinding.actionKey == 'MOVE_DR') {
+      tookTurn = this.moveAvatar(1  , 1);
+    }
+
+    else if    (actionBinding.actionKey == 'PERSISTENCE') {
+      Game.switchUiMode(Game.UIMode.gamePersistence);
+    }  else if (actionBinding.actionKey == 'CANCEL') {
+      return false;
+    }
+
+/*
     if (inputType == 'keypress') {
 
       // NOTE: a lot of repeated call below - think about where/how that might be done differently...?
@@ -308,6 +371,7 @@ Game.UIMode.gamePlay = {
       }
     }
     else if (inputType == 'keydown') {
+
       // console.log('gameStart inputType:');
       // console.dir(inputType);
       // console.log('gameStart inputData:');
@@ -319,7 +383,7 @@ Game.UIMode.gamePlay = {
         Game.switchUiMode(Game.UIMode.gamePersistence);
       }
     }
-
+*/
     if (tookTurn) {
       this.getAvatar().raiseEntityEvent('actionDone');
       Game.Message.ageMessages();
