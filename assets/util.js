@@ -9,6 +9,13 @@ Game.util = {
     return res;
   },
 
+  ID_SEQUENCE: 0,
+
+  uniqueId: function() {
+     Game.util.ID_SEQUENCE++;
+     return Date.now()+'-'+Game.util.ID_SEQUENCE+'-'+Game.util.randomString(24);
+  },
+
   init2DArray: function (x,y,initVal) {
     var a = [];
     for (var xdim=0; xdim < x; xdim++) {

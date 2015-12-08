@@ -12,7 +12,7 @@ Game.Entity = function(template) {
     this.attr._generator_template_key = template.generator_template_key || '';
     this.attr._mapId = null;
 
-    this.attr._id = template.presetId || Game.util.randomString(32);
+    this.attr._id = template.presetId || Game.util.uniqueId();
     Game.DATASTORE.ENTITY[this.attr._id] = this;
 
     // mixin sutff

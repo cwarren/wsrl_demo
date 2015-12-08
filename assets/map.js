@@ -7,7 +7,7 @@ Game.Map = function (mapTileSetName) {
   this._tiles = Game.MapTileSets[mapTileSetName].getMapTiles();
 
   this.attr = {
-    _id: Game.util.randomString(32),
+    _id: Game.util.uniqueId(),
     _mapTileSetName: mapTileSetName,
     _width: this._tiles.length,
     _height: this._tiles[0].length,
