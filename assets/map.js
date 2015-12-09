@@ -1,13 +1,13 @@
 Game.DATASTORE.MAP = {};
 
-Game.Map = function (mapTileSetName) {
+Game.Map = function (mapTileSetName,presetId) {
 
   //console.log("setting up new map using "+mapTileSetName+" tile set");
 
   this._tiles = Game.MapTileSets[mapTileSetName].getMapTiles();
 
   this.attr = {
-    _id: Game.util.uniqueId(),
+    _id: presetId||Game.util.uniqueId(),
     _mapTileSetName: mapTileSetName,
     _width: this._tiles.length,
     _height: this._tiles[0].length,

@@ -124,7 +124,7 @@ Game.UIMode.gamePersistence = {
       for (var mapId in state_data.MAP) {
         if (state_data.MAP.hasOwnProperty(mapId)) {
           var mapAttr = JSON.parse(state_data.MAP[mapId]);
-          Game.DATASTORE.MAP[mapId] = new Game.Map(mapAttr._mapTileSetName);
+          Game.DATASTORE.MAP[mapId] = new Game.Map(mapAttr._mapTileSetName,mapId);
           Game.DATASTORE.MAP[mapId].fromJSON(state_data.MAP[mapId]);
         }
       }
