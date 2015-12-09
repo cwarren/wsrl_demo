@@ -28,14 +28,10 @@ I think it's time to tackle key binding. In essence, this is untangling the keys
 - automatically generated help
 - clearer code - easier to read, and more informative
 
-NOTE/TODO: save-restore has some issues- re-create by
-1. new game
-2. save
-3. move around
-4. reload
-5. kill something
-6. save
-7. reload
-
+TODO: refactor keybinding to move the binding info into the same general hash as the action definitions - make it easier to ensure that each action is covered by all keybinding sets
+  - restructure action hash
+  - re=do calcBindingLookups to work with new structure
+  - re-do useKeyBinding to do things differently using the new structure (mainly just storing the binding set key)
+TODO: wasd key binding set, command to switch between them
 
 The help system will be the next milestone after key binding. It will introduce uimode sub-systems, as well as add a couple of new commands.
