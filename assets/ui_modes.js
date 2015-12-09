@@ -71,7 +71,14 @@ Game.UIMode.gamePersistence = {
     } else if (actionBinding.actionKey == 'PERSISTENCE_NEW') {
       this.newGame();
     } else if (actionBinding.actionKey == 'CANCEL') {
-      Game.switchUiMode('gamePlay');
+      if (Object.keys(Game.DATASTORE.MAP).length < 1) {
+        this.newGame();
+      } else {
+        Game.switchUiMode('gamePlay');
+      }
+    } else if (actionBinding.actionKey == 'HELP') {
+      console.log('TODO: set up help stuff for gamepersistence');
+      Game.addUiMode('LAYER_textReading');
     }
     return false;
   },
@@ -331,6 +338,9 @@ Game.UIMode.gamePlay = {
       Game.KeyBinding.swapToNextKeyBinding();
     } else if (actionBinding.actionKey == 'PERSISTENCE') {
       Game.switchUiMode('gamePersistence');
+    } else if (actionBinding.actionKey == 'HELP') {
+      console.log('TODO: set up help stuff for gameplay');
+      Game.addUiMode('LAYER_textReading');
     }
 
     if (tookTurn) {
@@ -365,12 +375,12 @@ Game.UIMode.gamePlay = {
 //#############################################################################
 //#############################################################################
 
-Game.UIMode.textReading = {
+Game.UIMode.LAYER_textReading = {
   _storedKeyBinding: '',
-  _text: '',
+  _text: 'default',
   enter: function () {
     this._storedKeyBinding = Game.KeyBinding.getKeyBinding();
-    Game.KeyBinding.setKeyBinding('textReading');
+    Game.KeyBinding.setKeyBinding('LAYER_textReading');
     Game.refresh();
     //console.log('game persistence');
   },
@@ -380,7 +390,7 @@ Game.UIMode.textReading = {
   },
   render: function (display) {
     var dims = Game.util.getDisplayDim(display);
-    display.drawText(1,3,Game.UIMode.DEFAULT_COLOR_STR+"text is "+text, dims.w-2);
+    display.drawText(1,3,Game.UIMode.DEFAULT_COLOR_STR+"text is "+this._text, dims.w-2);
 //    console.log('TODO: check whether local storage has a game before offering restore');
 //    console.log('TODO: check whether a game is in progress before offering restore');
   },
@@ -393,6 +403,10 @@ Game.UIMode.textReading = {
     // console.log('----------');
     if (! actionBinding) {
       return false;
+    }
+
+    if (actionBinding.actionKey == 'CANCEL') {
+      Game.removeUiMode();
     }
 /*
     if        (actionBinding.actionKey == 'PERSISTENCE_SAVE') {

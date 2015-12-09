@@ -39,9 +39,11 @@ Those two pieces seem like decent size chunks. I'll leave gameplay sub-modes for
 -----------
 
 In thinking about how to handle swapping back from the help ui mode to wherever to the help was activated from I've realized that it would probably make sense to change the general way that ui mode handling works. Currently the game has a single ui mode tracker, _curUiMode, which is managed via the switchUiMode method. I think it would be useful to have a ui mode stack instead of the stateless single tracker. However, that does potentially introduce more state that needs to be saved, which means the stack should store identifiers rather than objects. So...
--  _curUiMode => _uiModeStack (which will be an array used as a reverse stack (i.e. unshift and shift instead of push and pop) to make access easier - the 'current' ui mode will always be index 0 rather than having to worry about how to get to the last item in the array)
-- _uiModeStack => stores identifiers rather than full objects
-- switchUiMode => swaps around only _uiModeStack[0]
-- new method => addUiMode, which adds the new mode to the stack and handles the mode switching stuff
-- new method => removeUiMode, which removes the mode at the top of the stack and handles mode switching stuff
+DONE -  _curUiMode => _uiModeStack (which will be an array used as a reverse stack (i.e. unshift and shift instead of push and pop) to make access easier - the 'current' ui mode will always be index 0 rather than having to worry about how to get to the last item in the array)
+DONE - _uiModeStack => stores identifiers rather than full objects
+DONE - switchUiMode => swaps around only _uiModeStack[0]
+DONE - new method => addUiMode, which adds the new mode to the stack and handles the mode switching stuff
+DONE - new method => removeUiMode, which removes the mode at the top of the stack and handles mode switching stuff
 - game persistence => implement save and restore for _uiModeStack (it will take a bit of thought about the best way to set up an existing stack)
+
+Established a convention that uiModes that use add/remove instead of switch are prefixed with 'LAYER_' - e.g. Game.UIMode.LAYER_textReading. Should probably enforce that convention in the relevant functions....
