@@ -70,27 +70,6 @@ Game.UIMode.gamePersistence = {
       Game.switchUiMode(Game.UIMode.gamePlay);
     }
     return false;
-
-/*
-  //  console.log('gameStart inputType:');
-  //  console.dir(inputType);
-  //  console.log('gameStart inputData:');
-  //  console.dir(inputData);
-    if (inputType == 'keypress') {
-      var inputChar = String.fromCharCode(inputData.charCode);
-      if (inputChar == 'S') { // ignore the various modding keys - control, shift, etc.
-        this.saveGame();
-      } else if (inputChar == 'L') {
-        this.restoreGame();
-      } else if (inputChar == 'N') {
-        this.newGame();
-      }
-    } else if (inputType == 'keydown') {
-      if (inputData.keyCode == 27) { // 'Escape'
-        Game.switchUiMode(Game.UIMode.gamePlay);
-      }
-    }
-    */
   },
   saveGame: function () {
     if (this.localStorageAvailable()) {
@@ -192,19 +171,7 @@ Game.UIMode.gamePersistence = {
     if (state_hash_name) {
       state = this[state_hash_name];
     }
-    var json = JSON.stringify(state);
-
-    // var json = {};
-    // for (var at in state) {
-    //   if (state.hasOwnProperty(at)) {
-    //     if (state[at] instanceof Object && 'toJSON' in state[at]) {
-    //       json[at] = state[at].toJSON();
-    //     } else {
-    //       json[at] = state[at];
-    //     }
-    //   }
-    // }
-    return json;
+    return JSON.stringify(state);
   },
   BASE_fromJSON: function (json,state_hash_name) {
     var using_state_hash = 'attr';
@@ -212,15 +179,6 @@ Game.UIMode.gamePersistence = {
       using_state_hash = state_hash_name;
     }
     this[using_state_hash] = JSON.parse(json);
-    // for (var at in this[using_state_hash]) {
-    //   if (this[using_state_hash].hasOwnProperty(at)) {
-    //     if (this[using_state_hash][at] instanceof Object && 'fromJSON' in this[using_state_hash][at]) {
-    //       this[using_state_hash][at].fromJSON(json[at]);
-    //     } else {
-    //       this[using_state_hash][at] = json[at];
-    //     }
-    //   }
-    // }
   }
 };
 
@@ -234,14 +192,12 @@ Game.UIMode.gamePlay = {
   JSON_KEY: 'uiMode_gamePlay',
   enter: function () {
     // console.log('game playing');
-    // console.log('engine lock state is '+Game.TimeEngine._lock);
     if (this.attr._avatarId) {
       this.setCameraToAvatar();
     }
     Game.TimeEngine.unlock();
+    Game.KeyBinding.informPlayer();
     Game.refresh();
-    // console.log('end enter game play; engine lock state is '+Game.TimeEngine._lock);
-    //this.getAvatar().raiseEntityEvent('actionDone');
   },
   exit: function () {
     Game.refresh();
@@ -263,17 +219,7 @@ Game.UIMode.gamePlay = {
     var fg = Game.UIMode.DEFAULT_COLOR_FG;
     var bg = Game.UIMode.DEFAULT_COLOR_BG;
     this.getMap().renderOn(display,this.attr._cameraX,this.attr._cameraY);
-    // display.drawText(1,1,"game play",fg,bg); // DEV
-    // display.drawText(1,3,"press [Enter] to win",fg,bg);
-    // display.drawText(1,4,"press [Esc] to lose",fg,bg);
-    // display.drawText(1,5,"press = to save, restore, or start a new game",fg,bg);
-
-    //this.renderAvatar(display);
   },
-  // renderAvatar: function (display) {
-  //   Game.Symbol.AVATAR.draw(display,this.attr._avatar.getX()-this.attr._cameraX+display._options.width/2,
-  //                                   this.attr._avatar.getY()-this.attr._cameraY+display._options.height/2);
-  // },
   renderAvatarInfo: function (display) {
     var fg = Game.UIMode.DEFAULT_COLOR_FG;
     var bg = Game.UIMode.DEFAULT_COLOR_BG;
@@ -305,7 +251,7 @@ Game.UIMode.gamePlay = {
     // console.log('action binding is');
     // console.dir(actionBinding);
     // console.log('----------');
-    if (! actionBinding) {
+    if ((! actionBinding) || (actionBinding.actionKey == 'CANCEL')) {
       return false;
     }
 
@@ -330,69 +276,18 @@ Game.UIMode.gamePlay = {
       tookTurn = this.moveAvatar(1  , 1);
     }
 
-    else if    (actionBinding.actionKey == 'PERSISTENCE') {
+    else if (actionBinding.actionKey   == 'CHANGE_BINDINGS') {
+      Game.KeyBinding.swapToNextKeyBinding();
+    } else if (actionBinding.actionKey == 'PERSISTENCE') {
       Game.switchUiMode(Game.UIMode.gamePersistence);
-    }  else if (actionBinding.actionKey == 'CANCEL') {
-      return false;
     }
 
-/*
-    if (inputType == 'keypress') {
-
-      // NOTE: a lot of repeated call below - think about where/how that might be done differently...?
-      var pressedKey = String.fromCharCode(inputData.charCode);
-      if (inputData.keyIdentifier == 'Enter') {
-        Game.switchUiMode(Game.UIMode.gameWin);
-        return;
-      } else if (pressedKey == '1') {
-        //Game.Message.ageMessages();
-        tookTurn = this.moveAvatar(-1,1);
-      } else if (pressedKey == '2') {
-        //Game.Message.ageMessages();
-        tookTurn = this.moveAvatar(0,1);
-      } else if (pressedKey == '3') {
-        // Game.Message.ageMessages();
-        tookTurn = this.moveAvatar(1,1);
-      } else if (pressedKey == '4') {
-        // Game.Message.ageMessages();
-        tookTurn = this.moveAvatar(-1,0);
-      } else if (pressedKey == '5') {
-        // do nothing / stay still
-        tookTurn = true;
-        //Game.renderDisplayMessage();
-      } else if (pressedKey == '6') {
-        // Game.Message.ageMessages();
-        tookTurn = this.moveAvatar(1,0);
-      } else if (pressedKey == '7') {
-        // Game.Message.ageMessages();
-        tookTurn = this.moveAvatar(-1,-1);
-      } else if (pressedKey == '8') {
-        // Game.Message.ageMessages();
-        tookTurn = this.moveAvatar(0,-1);
-      } else if (pressedKey == '9') {
-        // Game.Message.ageMessages();
-        tookTurn = this.moveAvatar(1,-1);
-      }
-    }
-    else if (inputType == 'keydown') {
-
-      // console.log('gameStart inputType:');
-      // console.dir(inputType);
-      // console.log('gameStart inputData:');
-      // console.dir(inputData);
-      if (inputData.keyCode == 27) { // 'Escape'
-        Game.switchUiMode(Game.UIMode.gameLose);
-      }
-      else if (inputData.keyCode == 187) { // '='
-        Game.switchUiMode(Game.UIMode.gamePersistence);
-      }
-    }
-*/
     if (tookTurn) {
       this.getAvatar().raiseEntityEvent('actionDone');
       Game.Message.ageMessages();
       return true;
     }
+    return false;
   },
   setupNewGame: function () {
     this.setMap(new Game.Map('caves1'));

@@ -29,9 +29,11 @@ I think it's time to tackle key binding. In essence, this is untangling the keys
 - clearer code - easier to read, and more informative
 
 TODO: refactor keybinding to move the binding info into the same general hash as the action definitions - make it easier to ensure that each action is covered by all keybinding sets
-  - restructure action hash
-  - re=do calcBindingLookups to work with new structure
-  - re-do useKeyBinding to do things differently using the new structure (mainly just storing the binding set key)
-TODO: wasd key binding set, command to switch between them
+DONE  - restructure action hash
+DONE  - re=do calcBindingLookups to work with new structure
+DONE  - re-do useKeyBinding to do things differently using the new structure (mainly just storing the binding set key)
+TODO:
+DONE wasd key binding set,
+DONE command to switch between them
 
-The help system will be the next milestone after key binding. It will introduce uimode sub-systems, as well as add a couple of new commands.
+The help system will be the next milestone after key binding. It will introduce uimode sub-systems.... perhaps, as well as add a couple of new commands.
