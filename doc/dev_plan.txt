@@ -43,5 +43,5 @@ In thinking about how to handle swapping back from the help ui mode to wherever 
 - _uiModeStack => stores identifiers rather than full objects
 - switchUiMode => swaps around only _uiModeStack[0]
 - new method => addUiMode, which adds the new mode to the stack and handles the mode switching stuff
-- new method => addUiMode, which removes the mode at the top of the stack and handles mode switching stuff
+- new method => removeUiMode, which removes the mode at the top of the stack and handles mode switching stuff
 - game persistence => implement save and restore for _uiModeStack (it will take a bit of thought about the best way to set up an existing stack)

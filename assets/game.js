@@ -12,7 +12,7 @@ window.onload = function() {
         document.getElementById('wsrl-main-display').appendChild(   Game.getDisplay('main').getContainer());
         document.getElementById('wsrl-message-display').appendChild(   Game.getDisplay('message').getContainer());
 
-        Game.switchUiMode(Game.UIMode.gameStart);
+        Game.switchUiMode('gameStart');
     }
 };
 
@@ -40,6 +40,7 @@ var Game = {
 
   _game: null,
   _curUiMode: null,
+  _uiModeNameStack: [],
   _randomSeed: 0,
   TRANSIENT_RNG: null,
 
@@ -67,8 +68,8 @@ var Game = {
     var bindEventToUiMode = function(event) {
         window.addEventListener(event, function(e) {
             // send event to the ui mode if there is one
-            if (game._curUiMode !== null) {
-                game._curUiMode.handleInput(event, e);
+            if (game.getCurUiMode() !== null) {
+                game.getCurUiMode().handleInput(event, e);
             }
         });
     };
@@ -111,20 +112,20 @@ var Game = {
   },
   renderDisplayAvatar: function() {
     this._display.avatar.o.clear();
-    if (this._curUiMode === null) {
+    if (this.getCurUiMode() === null) {
       return;
     }
-    if (this._curUiMode.hasOwnProperty('renderAvatarInfo')) {
-      this._curUiMode.renderAvatarInfo(this._display.avatar.o);
+    if (this.getCurUiMode().hasOwnProperty('renderAvatarInfo')) {
+      this.getCurUiMode().renderAvatarInfo(this._display.avatar.o);
     }
   },
   renderDisplayMain: function() {
     this._display.main.o.clear();
-    if (this._curUiMode === null) {
+    if (this.getCurUiMode() === null) {
       return;
     }
-    if (this._curUiMode.hasOwnProperty('render')) {
-      this._curUiMode.render(this._display.main.o);
+    if (this.getCurUiMode().hasOwnProperty('render')) {
+      this.getCurUiMode().render(this._display.main.o);
     }
   },
   renderDisplayMessage: function() {
@@ -133,26 +134,52 @@ var Game = {
 
   eventHandler: function (eventType, evt) {
     // When an event is received have the current ui handle it
-    if (this._curUiMode !== null) {
-        this._curUiMode.handleInput(eventType, evt);
+    if (this.getCurUiMode() !== null) {
+        this.getCurUiMode().handleInput(eventType, evt);
     }
   },
 
-  switchUiMode: function (newUiMode) {
-    if (this._curUiMode !== null) {
-      this._curUiMode.exit();
+  getCurUiMode: function () {
+    var uiModeName = this._uiModeNameStack[0];
+    if (uiModeName) {
+      return Game.UIMode[uiModeName];
     }
-    this._curUiMode = newUiMode;
-    if (this._curUiMode !== null) {
-      this._curUiMode.enter();
+    return null;
+  },
+  switchUiMode: function (newUiModeName) {
+    var curMode = this.getCurUiMode();
+    if (curMode !== null) {
+      curMode.exit();
+    }
+    this._uiModeNameStack[0] = newUiModeName;
+    var newMode = Game.UIMode[newUiModeName];
+    if (newMode) {
+      newMode.enter();
     }
     this.renderDisplayAll();
+  },
+  addUiMode: function (newUiModeName) {
+    // var curMode = this.getCurUiMode();
+    // if (curMode !== null) {
+    //   curMode.exit();
+    // }
+    this._uiModeNameStack.unshift(newUiModeName);
+    var newMode = Game.UIMode[newUiModeName];
+    if (newMode) {
+      newMode.enter();
+    }
+    this.renderDisplayAll();
+  },
+  removeUiMode: function () {
+    var curMode = this.getCurUiMode();
+    if (curMode !== null) {
+      curMode.exit();
+    }
+    this._uiModeNameStack.shift();
+    // curMode = this.getCurUiMode();
+    // if (curMode !== null) {
+    //   curMode.enter();
+    // }
+    this.renderDisplayAll();
   }
-
-  // toJSON: function() {
-  //   var json = {};
-  //   json._randomSeed = this._randomSeed;
-  //   json[Game.UIMode.gamePlay.JSON_KEY] = Game.UIMode.gamePlay.toJSON();
-  //   return json;
-  // }
 };

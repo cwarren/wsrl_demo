@@ -27,7 +27,7 @@ Game.UIMode.gameStart = {
   //  console.log('gameStart inputData:');
   //  console.dir(inputData);
     if (inputData.charCode !== 0) { // ignore the various modding keys - control, shift, etc.
-      Game.switchUiMode(Game.UIMode.gamePersistence);
+      Game.switchUiMode('gamePersistence');
     }
   }
 };
@@ -71,7 +71,7 @@ Game.UIMode.gamePersistence = {
     } else if (actionBinding.actionKey == 'PERSISTENCE_NEW') {
       this.newGame();
     } else if (actionBinding.actionKey == 'CANCEL') {
-      Game.switchUiMode(Game.UIMode.gamePlay);
+      Game.switchUiMode('gamePlay');
     }
     return false;
   },
@@ -92,7 +92,7 @@ Game.UIMode.gamePersistence = {
 
       window.localStorage.setItem(Game._PERSISTANCE_NAMESPACE, JSON.stringify(Game.DATASTORE));
       Game.Message.send('game saved');
-      Game.switchUiMode(Game.UIMode.gamePlay);
+      Game.switchUiMode('gamePlay');
     }
   },
   restoreGame: function () {
@@ -148,7 +148,7 @@ Game.UIMode.gamePersistence = {
       Game.Scheduler._queue._time = state_data.SCHEDULE_TIME;
 
       Game.Message.send('game loaded');
-      Game.switchUiMode(Game.UIMode.gamePlay);
+      Game.switchUiMode('gamePlay');
       Game.KeyBinding.informPlayer();
     }
   },
@@ -160,7 +160,7 @@ Game.UIMode.gamePersistence = {
     Game.setRandomSeed(5 + Math.floor(Game.TRANSIENT_RNG.getUniform()*100000));
     Game.UIMode.gamePlay.setupNewGame();
     Game.Message.send('new game started');
-    Game.switchUiMode(Game.UIMode.gamePlay);
+    Game.switchUiMode('gamePlay');
   },
   localStorageAvailable: function () { // NOTE: see https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
   	try {
@@ -330,7 +330,7 @@ Game.UIMode.gamePlay = {
     else if (actionBinding.actionKey   == 'CHANGE_BINDINGS') {
       Game.KeyBinding.swapToNextKeyBinding();
     } else if (actionBinding.actionKey == 'PERSISTENCE') {
-      Game.switchUiMode(Game.UIMode.gamePersistence);
+      Game.switchUiMode('gamePersistence');
     }
 
     if (tookTurn) {
@@ -402,7 +402,7 @@ Game.UIMode.textReading = {
     } else if (actionBinding.actionKey == 'PERSISTENCE_NEW') {
       this.newGame();
     } else if (actionBinding.actionKey == 'CANCEL') {
-      Game.switchUiMode(Game.UIMode.gamePlay);
+      Game.switchUiMode('gamePlay');
     }
     */
     return false;
