@@ -18,6 +18,7 @@ Game.KeyBinding = {
       nextBindingIndex = 0;
     }
     this.setKeyBinding(this._availableBindings[nextBindingIndex]);
+    Game.Message.ageMessages();
     this.informPlayer();
   },
   informPlayer: function () {

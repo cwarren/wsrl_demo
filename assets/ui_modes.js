@@ -7,9 +7,11 @@ Game.UIMode.gameStart = {
   enter: function () {
     //console.log('game starting');
     Game.Message.send("Welcome to WSRL");
+    Game.KeyBinding.setKeyBinding();
     Game.refresh();
   },
   exit: function () {
+    Game.KeyBinding.informPlayer();
     Game.refresh();
   },
   render: function (display) {
@@ -76,6 +78,8 @@ Game.UIMode.gamePersistence = {
       Game.DATASTORE.GAME_PLAY = Game.UIMode.gamePlay.attr;
       Game.DATASTORE.MESSAGES = Game.Message.attr;
 
+      Game.DATASTORE.KEY_BINDING_SET = this._storedKeyBinding; // NOTE: not getting the key binding directly because it's set to 'persist when this ui mode is entered - the 'real' key binding is saved in _storedKeyBinding
+
       Game.DATASTORE.SCHEDULE = {};
       // NOTE: offsetting times by 1 so later restore can just drop them in and go
       Game.DATASTORE.SCHEDULE[Game.Scheduler._current.getId()] = 1;
@@ -127,6 +131,7 @@ Game.UIMode.gamePersistence = {
       // game play et al
       Game.UIMode.gamePlay.attr = state_data.GAME_PLAY;
       Game.Message.attr = state_data.MESSAGES;
+      this._storedKeyBinding = state_data.KEY_BINDING_SET; // NOTE: not setting the key binding directly because it's set to _storedKeyBinding when this ui mode is exited
 
       // schedule
       Game.initializeTimingEngine();
@@ -196,7 +201,7 @@ Game.UIMode.gamePlay = {
       this.setCameraToAvatar();
     }
     Game.TimeEngine.unlock();
-    Game.KeyBinding.informPlayer();
+    // Game.KeyBinding.informPlayer(); // NOTE: not sure one way or another if this should be here - eventual help system should obviate the need for this message...
     Game.refresh();
   },
   exit: function () {
