@@ -31,11 +31,15 @@ Game.UIMode.gameStart = {
 
 Game.UIMode.gamePersistence = {
   RANDOM_SEED_KEY: 'gameRandomSeed',
+  _storedKeyBinding: '',
   enter: function () {
+    this._storedKeyBinding = Game.KeyBinding.getKeyBinding();
+    Game.KeyBinding.setKeyBinding('persist');
     Game.refresh();
     //console.log('game persistence');
   },
   exit: function () {
+    Game.KeyBinding.setKeyBinding(this._storedKeyBinding);
     Game.refresh();
   },
   render: function (display) {

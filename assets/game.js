@@ -63,7 +63,7 @@ var Game = {
     }
     this.renderDisplayAll();
 
-    Game.KeyBinding.useKeyBinding();
+    Game.KeyBinding.setKeyBinding();
 
     var game = this;
     var bindEventToScreen = function(event) {
