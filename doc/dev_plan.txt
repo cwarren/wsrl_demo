@@ -8,32 +8,30 @@ Addendum: Which bites are taken when is key to success.
 
 ------------
 
-Having handled a couple of items it's a good time to re-visit the task list - remove completed items, add new ones, and figure out priorities for next steps.
-- advancement
-- items & inventory
-- equipment
-- key binding system
-- help system (at the least, list available actions / commands); begin gamePlay sub-modes
-- random tables (ways of selecting at random from a weighted and possibly dynamic set)
-- improved map generation
+Some of the tasks that would need to be done for a full game aren't really necessary for a base game, so I'm (at least for now) setting them aside. I'm also far enough along that I'm going to put a bit of thought into ordering the milestone list at this point.
+Base game:
+- help system (at the least, list available actions / commands)
+- mobs that attack the player, enhanced combat
 - real game win / lose conditions
-- ipad compatibility
 - map visibility limits; FOV, LOS, and all that jazz
 - remembered map
+- map modification - digging
+- items & inventory; gamePlay sub-modes
+- hunger, food, and eating
+- equipment
+- treasure drops
+- improved map generation - random seeds for maps, seeding items
+Later:
+- ongoing actions
+- avatar advancement - experience and improvement
+- game scoring
+- random tables (ways of selecting at random from a weighted and possibly dynamic set)
+- multiple maps and moving between them
+- improved map tiles and generation - more tile types, variable digging
+- throwing things & ranged combat
+- ipad compatibility
 
-I think it's time to tackle key binding. In essence, this is untangling the keys that the player presses from the commands the player is trying to use. Instead of the handleInput method of the uimodes interpreting the keyboard events they will delegate that to a sub-system and then will focus on the actual commands being issued. This provides:
-- easier extensibility
-- centralized input processing, which reduces error opportunities
-- support for multiple key binding sets (e.g. a PC layout vs a Mac layout)
-- automatically generated help
-- clearer code - easier to read, and more informative
 
-TODO: refactor keybinding to move the binding info into the same general hash as the action definitions - make it easier to ensure that each action is covered by all keybinding sets
-DONE  - restructure action hash
-DONE  - re=do calcBindingLookups to work with new structure
-DONE  - re-do useKeyBinding to do things differently using the new structure (mainly just storing the binding set key)
-TODO:
-DONE wasd key binding set,
-DONE command to switch between them
+So, the next milestone is the help system. One of the initial questions I have to answer is whether it's going to use its own ui mode or whether it will be a sub-mode of gameplay. I'm leaning towards the former since I think I might want to claim some of the keys that would otherwise be used for game commands. As I think about it I realize that there are potentially many other situations in which I'll want to display a bunch of text to the player, so maybe I'll generalize the ui mode to textReading and work on supporting appropriate commands for that. Then I need to figure out how to generate appropriate help text from the key binding info.
 
-The help system will be the next milestone after key binding. It will introduce uimode sub-systems.... perhaps, as well as add a couple of new commands.
+Those two pieces seem like decent size chunks. I'll leave gameplay sub-modes for later.
