@@ -77,7 +77,8 @@ Game.UIMode.gamePersistence = {
         Game.switchUiMode('gamePlay');
       }
     } else if (actionBinding.actionKey == 'HELP') {
-      console.log('TODO: set up help stuff for gamepersistence');
+      // console.log('TODO: set up help stuff for gamepersistence');
+      Game.UIMode.LAYER_textReading.setText(Game.KeyBinding.getBindingHelpText());
       Game.addUiMode('LAYER_textReading');
     }
     return false;
@@ -339,7 +340,8 @@ Game.UIMode.gamePlay = {
     } else if (actionBinding.actionKey == 'PERSISTENCE') {
       Game.switchUiMode('gamePersistence');
     } else if (actionBinding.actionKey == 'HELP') {
-      console.log('TODO: set up help stuff for gameplay');
+      // console.log('TODO: set up help stuff for gameplay');
+      Game.UIMode.LAYER_textReading.setText(Game.KeyBinding.getBindingHelpText());
       Game.addUiMode('LAYER_textReading');
     }
 
@@ -382,15 +384,19 @@ Game.UIMode.LAYER_textReading = {
     this._storedKeyBinding = Game.KeyBinding.getKeyBinding();
     Game.KeyBinding.setKeyBinding('LAYER_textReading');
     Game.refresh();
+    Game.specialMessage("[Esc] to exit, [ and ] for scrolling");
+
     //console.log('game persistence');
   },
   exit: function () {
     Game.KeyBinding.setKeyBinding(this._storedKeyBinding);
-    Game.refresh();
+    setTimeout(function(){
+       Game.refresh();
+    }, 1);
   },
   render: function (display) {
     var dims = Game.util.getDisplayDim(display);
-    display.drawText(1,3,Game.UIMode.DEFAULT_COLOR_STR+"text is "+this._text, dims.w-2);
+    display.drawText(1,1,Game.UIMode.DEFAULT_COLOR_STR+this._text, dims.w-2);
 //    console.log('TODO: check whether local storage has a game before offering restore');
 //    console.log('TODO: check whether a game is in progress before offering restore');
   },

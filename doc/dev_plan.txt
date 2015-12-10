@@ -34,6 +34,8 @@ Later:
 
 So, the next milestone is the help system. One of the initial questions I have to answer is whether it's going to use its own ui mode or whether it will be a sub-mode of gameplay. I'm leaning towards the former since I think I might want to claim some of the keys that would otherwise be used for game commands. As I think about it I realize that there are potentially many other situations in which I'll want to display a bunch of text to the player, so maybe I'll generalize the ui mode to textReading and work on supporting appropriate commands for that. Then I need to figure out how to generate appropriate help text from the key binding info.
 
+TODO: implement textReader data nav (i.e. scrolling stuff)
+
 Those two pieces seem like decent size chunks. I'll leave gameplay sub-modes for later.
 
 -----------
@@ -44,6 +46,7 @@ DONE - _uiModeStack => stores identifiers rather than full objects
 DONE - switchUiMode => swaps around only _uiModeStack[0]
 DONE - new method => addUiMode, which adds the new mode to the stack and handles the mode switching stuff
 DONE - new method => removeUiMode, which removes the mode at the top of the stack and handles mode switching stuff
-- game persistence => implement save and restore for _uiModeStack (it will take a bit of thought about the best way to set up an existing stack)
+??? - game persistence => implement save and restore for _uiModeStack (it will take a bit of thought about the best way to set up an existing stack; and it's possible this isn't actually necessary at all)
 
-Established a convention that uiModes that use add/remove instead of switch are prefixed with 'LAYER_' - e.g. Game.UIMode.LAYER_textReading. Should probably enforce that convention in the relevant functions....
+Established a convention that uiModes that use add/remove instead of switch are prefixed with 'LAYER_' - e.g. Game.UIMode.LAYER_textReading.
+DONE- Should probably enforce that convention in the relevant functions....

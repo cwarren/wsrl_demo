@@ -131,7 +131,14 @@ var Game = {
   renderDisplayMessage: function() {
     Game.Message.render(this._display.message.o);
   },
-
+  hideDisplayMessage: function() {
+    this._display.message.o.clear();
+  },
+  specialMessage: function(msg) {
+    this._display.message.o.clear();
+    this._display.message.o.drawText(1,1,'%c{#fff}%b{#000}'+msg,79);
+  },
+  
   eventHandler: function (eventType, evt) {
     // When an event is received have the current ui handle it
     if (this.getCurUiMode() !== null) {
@@ -147,6 +154,10 @@ var Game = {
     return null;
   },
   switchUiMode: function (newUiModeName) {
+    if (newUiModeName.startsWith('LAYER_')) {
+      console.log('cannot switchUiMode to layer '+newUiModeName);
+      return;
+    }
     var curMode = this.getCurUiMode();
     if (curMode !== null) {
       curMode.exit();
@@ -156,19 +167,23 @@ var Game = {
     if (newMode) {
       newMode.enter();
     }
-    this.renderDisplayAll();
+    // this.renderDisplayAll();
   },
-  addUiMode: function (newUiModeName) {
+  addUiMode: function (newUiModeLayerName) {
+    if (! newUiModeLayerName.startsWith('LAYER_')) {
+      console.log('addUiMode not possible for non-layer '+newUiModeLayerName);
+      return;
+    }
     // var curMode = this.getCurUiMode();
     // if (curMode !== null) {
     //   curMode.exit();
     // }
-    this._uiModeNameStack.unshift(newUiModeName);
-    var newMode = Game.UIMode[newUiModeName];
+    this._uiModeNameStack.unshift(newUiModeLayerName);
+    var newMode = Game.UIMode[newUiModeLayerName];
     if (newMode) {
       newMode.enter();
     }
-    this.renderDisplayAll();
+    // this.renderDisplayAll();
   },
   removeUiMode: function () {
     var curMode = this.getCurUiMode();
@@ -180,6 +195,6 @@ var Game = {
     // if (curMode !== null) {
     //   curMode.enter();
     // }
-    this.renderDisplayAll();
+    // this.renderDisplayAll();
   }
 };
