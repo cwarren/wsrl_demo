@@ -23,3 +23,12 @@ Game.EntityGenerator.learn({
   maxHp: 2,
   mixins: ["HitPoints", "WanderActor", "WalkerCorporeal"]
 });
+
+Game.EntityGenerator.learn({
+  name: 'angry squirrel',
+  chr:'&',
+  fg:'#aaa',
+  maxHp: 3,
+  attackPower: 2,
+  mixins: ["HitPoints", "WanderActor", "WalkerCorporeal", "MeleeAttacker"]
+});
