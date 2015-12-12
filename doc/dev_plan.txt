@@ -10,7 +10,6 @@ Addendum: Which bites are taken when is key to success.
 
 Some of the tasks that would need to be done for a full game aren't really necessary for a base game, so I'm (at least for now) setting them aside. I'm also far enough along that I'm going to put a bit of thought into ordering the milestone list at this point.
 Base game:
-- help system (at the least, list available actions / commands)
 - mobs that attack the player, enhanced combat
 - real game win / lose conditions
 - map visibility limits; FOV, LOS, and all that jazz
@@ -29,25 +28,10 @@ Later:
 - multiple maps and moving between them
 - improved map tiles and generation - more tile types, variable digging
 - throwing things & ranged combat
-- ipad compatibility
+- improved combat mechanics
+- ipad compatibility (capturing input, figuring out key bindings)
 
 
-So, the next milestone is the help system. One of the initial questions I have to answer is whether it's going to use its own ui mode or whether it will be a sub-mode of gameplay. I'm leaning towards the former since I think I might want to claim some of the keys that would otherwise be used for game commands. As I think about it I realize that there are potentially many other situations in which I'll want to display a bunch of text to the player, so maybe I'll generalize the ui mode to textReading and work on supporting appropriate commands for that. Then I need to figure out how to generate appropriate help text from the key binding info.
+Simple mobs that attack the player has two main pieces in my mind. First, a new mob that has the MeleeAttacker mixin. Second, a more interesting AI that chases the player. Probably want to fold non-standard (and different from each other) move and attack durations in this as well.
 
-DONE: implement textReader data nav (i.e. scrolling stuff)
-
-Those two pieces seem like decent size chunks. I'll leave gameplay sub-modes for later.
-
------------
-
-In thinking about how to handle swapping back from the help ui mode to wherever to the help was activated from I've realized that it would probably make sense to change the general way that ui mode handling works. Currently the game has a single ui mode tracker, _curUiMode, which is managed via the switchUiMode method. I think it would be useful to have a ui mode stack instead of the stateless single tracker. However, that does potentially introduce more state that needs to be saved, which means the stack should store identifiers rather than objects. So...
-DONE -  _curUiMode => _uiModeStack (which will be an array used as a reverse stack (i.e. unshift and shift instead of push and pop) to make access easier - the 'current' ui mode will always be index 0 rather than having to worry about how to get to the last item in the array)
-DONE - _uiModeStack => stores identifiers rather than full objects
-DONE - switchUiMode => swaps around only _uiModeStack[0]
-DONE - new method => addUiMode, which adds the new mode to the stack and handles the mode switching stuff
-DONE - new method => removeUiMode, which removes the mode at the top of the stack and handles mode switching stuff
-??? - game persistence => implement save and restore for _uiModeStack (it will take a bit of thought about the best way to set up an existing stack; and it's possible this isn't actually necessary at all)
-Decided to skip persistence for the _uiModeStack - I'll revisit it if later work suggests it's needed, but for now if I only allow entry to gamePersistence from gamePlay then I don't need to worry about the stack on restore.
-
-Established a convention that uiModes that use add/remove instead of switch are prefixed with 'LAYER_' - e.g. Game.UIMode.LAYER_textReading.
-DONE- Should probably enforce that convention in the relevant functions....
+'Chase the player' implies 'see the player', which means that this milestone will probably also tackle basic entity FoV and sight radius stuff (but not LoS), as well as basic pathing. Good thing the attacking part of things is nice and simple, and rot.js does a lot of the heavy lifting for FoV and LoS...
