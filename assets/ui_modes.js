@@ -380,7 +380,10 @@ Game.UIMode.gamePlay = {
 Game.UIMode.LAYER_textReading = {
   _storedKeyBinding: '',
   _text: 'default',
+  _renderY: 0,
+  _renderScrollLimit: 0,
   enter: function () {
+    this._renderY = 0;
     this._storedKeyBinding = Game.KeyBinding.getKeyBinding();
     Game.KeyBinding.setKeyBinding('LAYER_textReading');
     Game.refresh();
@@ -396,9 +399,11 @@ Game.UIMode.LAYER_textReading = {
   },
   render: function (display) {
     var dims = Game.util.getDisplayDim(display);
-    display.drawText(1,1,Game.UIMode.DEFAULT_COLOR_STR+this._text, dims.w-2);
-//    console.log('TODO: check whether local storage has a game before offering restore');
-//    console.log('TODO: check whether a game is in progress before offering restore');
+    var linesTaken = display.drawText(1,this._renderY,Game.UIMode.DEFAULT_COLOR_STR+this._text, dims.w-2);
+    // console.log("linesTaken is "+linesTaken);
+    // console.log("dims.h is "+dims.h);
+    this._renderScrollLimit = dims.h - linesTaken;
+    if (this._renderScrollLimit > 0) { this._renderScrollLimit=0; }
   },
   handleInput: function (inputType,inputData) {
     // console.log(inputType);
@@ -414,12 +419,19 @@ Game.UIMode.LAYER_textReading = {
     if (actionBinding.actionKey == 'CANCEL') {
       Game.removeUiMode();
     }
-/*
-    if        (actionBinding.actionKey == 'PERSISTENCE_SAVE') {
-      this.saveGame();
-    } else if (actionBinding.actionKey == 'PERSISTENCE_LOAD') {
-      this.restoreGame();
-    } else if (actionBinding.actionKey == 'PERSISTENCE_NEW') {
+    if        (actionBinding.actionKey == 'DATA_NAV_UP') {
+      this._renderY++;
+      if (this._renderY > 0) { this._renderY = 0; }
+      Game.renderDisplayMain();
+      return true;
+    } else if (actionBinding.actionKey == 'DATA_NAV_DOWN') {
+      this._renderY--;
+      if (this._renderY < this._renderScrollLimit) { this._renderY = this._renderScrollLimit; }
+      Game.renderDisplayMain();
+      return true;
+    }
+    /*
+ else if (actionBinding.actionKey == 'PERSISTENCE_NEW') {
       this.newGame();
     } else if (actionBinding.actionKey == 'CANCEL') {
       Game.switchUiMode('gamePlay');
@@ -432,6 +444,8 @@ Game.UIMode.LAYER_textReading = {
   },
   setText: function (t) {
     this._text = t;
-//    Game.renderDisplayMain();
+    // for (var i = 0; i < 400; i++) {
+    //   this._text += ' '+['sit','amet','consectetur','adipiscing elit','sed','do','eiusmod','tempor','incididunt','ut','labore','et','dolore','magna','aliqua'].random();
+    // }
   }
 };
