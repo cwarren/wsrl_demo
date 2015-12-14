@@ -12,7 +12,8 @@ Game.Map = function (mapTileSetName,presetId) {
     _width: this._tiles.length,
     _height: this._tiles[0].length,
     _entitiesByLocation: {},
-    _locationsByEntity: {}
+    _locationsByEntity: {},
+    _rememberedCoords: {}
   };
 
   this._fov = null;
@@ -113,34 +114,6 @@ Game.Map.prototype.getEntitiesNearby = function (radius,x_or_pos,y) {
   return foundEnts;
 };
 
-Game.Map.prototype.getEntitiesNearby_LoS = function (radius,x_or_pos,y) {
-  var useX = x_or_pos,useY=y;
-  if (typeof x_or_pos == 'object') {
-    useX = x_or_pos.x;
-    useY = x_or_pos.y;
-  }
-  var entLocs = Object.keys(this.attr._entitiesByLocation);
-  var foundEnts = [];
-  if (entLocs.length < radius*radius*4) {
-    for (var i = 0; i < entLocs.length; i++) {
-      var el = entLocs[i].split(',');
-      if ((Math.abs(el[0]-useX) <= radius) && (Math.abs(el[1]-useY) <= radius)) {
-        foundEnts.push(Game.DATASTORE.ENTITY[this.attr._entitiesByLocation[entLocs[i]]]);
-      }
-    }
-  } else {
-    for (var cx = radius*-1; cx <= radius; cx++) {
-      for (var cy = radius*-1; cy <= radius; cy++) {
-        var entId = this.getEntity(useX+cx,useY+cy);
-        if (entId) {
-          foundEnts.push(Game.DATASTORE.ENTITY[entId]);
-        }
-      }
-    }
-  }
-  return foundEnts;
-};
-
 Game.Map.prototype.extractEntity = function (ent) {
   this.attr._entitiesByLocation[ent.getX()+","+ent.getY()] = undefined;
   this.attr._locationsByEntity[ent.getId()] = undefined;
@@ -175,13 +148,22 @@ Game.Map.prototype.getRandomWalkableLocation = function() {
   return this.getRandomLocation(function(t,tX,tY){ return t.isWalkable() && (!map.getEntity(tX,tY)); });
 };
 
-Game.Map.prototype.renderOn = function (display,camX,camY,showEntities,showTiles,maskRendered) {
+Game.Map.prototype.rememberCoords = function (toRemember) {
+  for (var coord in toRemember) {
+    if (toRemember.hasOwnProperty(coord)) {
+      this.attr._rememberedCoords[coord] = true;
+    }
+  }
+};
+
+Game.Map.prototype.renderOn = function (display,camX,camY,showEntities,showTiles,maskRendered,memoryOnly) {
   // console.log("display is ");
   // console.dir(display);
 
   var entitiesVisible = (showEntities !== undefined) ? showEntities : true;
   var tilesVisible = (showTiles !== undefined) ? showTiles : true;
   var isMasked = (maskRendered !== undefined) ? maskRendered : false;
+  var filterForRemembered = (memoryOnly !== undefined) ? memoryOnly : true;
 
   if (! entitiesVisible && ! tilesVisible) { return; }
 
@@ -192,6 +174,11 @@ Game.Map.prototype.renderOn = function (display,camX,camY,showEntities,showTiles
     for (var y = 0; y < dims.h; y++) {
       // Fetch the glyph for the tile and render it to the screen - sub in wall tiles for nullTiles / out-of-bounds
       var mapPos = {x:x+xStart,y:y+yStart};
+      if (filterForRemembered) {
+        if (! this.attr._rememberedCoords[mapPos.x+','+mapPos.y]) {
+          continue;
+        }
+      }
       if (tilesVisible) {
         var tile = this.getTile(mapPos);
         if (tile.getName() == 'nullTile') {
