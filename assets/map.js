@@ -15,7 +15,17 @@ Game.Map = function (mapTileSetName,presetId) {
     _locationsByEntity: {}
   };
 
+  this._fov = null;
+  this.setUpFov();
+
   Game.DATASTORE.MAP[this.attr._id] = this;
+};
+
+Game.Map.prototype.setUpFov = function () {
+  var map = this;
+  this._fov = new ROT.FOV.DiscreteShadowcasting(function(x, y) {
+                    return !map.getTile(x, y).isOpaque();
+                }, {topology: 8});
 };
 
 Game.Map.prototype.getId = function () {
@@ -28,6 +38,10 @@ Game.Map.prototype.getWidth = function () {
 
 Game.Map.prototype.getHeight = function () {
   return this.attr._height;
+};
+
+Game.Map.prototype.getFov = function () {
+  return this._fov;
 };
 
 Game.Map.prototype.getTile = function (x_or_pos,y) {
@@ -59,6 +73,7 @@ Game.Map.prototype.updateEntityLocation = function (ent) {
   this.attr._entitiesByLocation[pos.x+","+pos.y] = ent.getId();
   this.attr._locationsByEntity[ent.getId()] = pos.x+","+pos.y;
 };
+
 Game.Map.prototype.getEntity = function (x_or_pos,y) {
   var useX = x_or_pos,useY=y;
   if (typeof x_or_pos == 'object') {
@@ -68,6 +83,62 @@ Game.Map.prototype.getEntity = function (x_or_pos,y) {
   var entId = this.attr._entitiesByLocation[useX+','+useY];
   if (entId) { return Game.DATASTORE.ENTITY[entId]; }
   return  false;
+};
+
+Game.Map.prototype.getEntitiesNearby = function (radius,x_or_pos,y) {
+  var useX = x_or_pos,useY=y;
+  if (typeof x_or_pos == 'object') {
+    useX = x_or_pos.x;
+    useY = x_or_pos.y;
+  }
+  var entLocs = Object.keys(this.attr._entitiesByLocation);
+  var foundEnts = [];
+  if (entLocs.length < radius*radius*4) {
+    for (var i = 0; i < entLocs.length; i++) {
+      var el = entLocs[i].split(',');
+      if ((Math.abs(el[0]-useX) <= radius) && (Math.abs(el[1]-useY) <= radius)) {
+        foundEnts.push(Game.DATASTORE.ENTITY[this.attr._entitiesByLocation[entLocs[i]]]);
+      }
+    }
+  } else {
+    for (var cx = radius*-1; cx <= radius; cx++) {
+      for (var cy = radius*-1; cy <= radius; cy++) {
+        var entId = this.getEntity(useX+cx,useY+cy);
+        if (entId) {
+          foundEnts.push(Game.DATASTORE.ENTITY[entId]);
+        }
+      }
+    }
+  }
+  return foundEnts;
+};
+
+Game.Map.prototype.getEntitiesNearby_LoS = function (radius,x_or_pos,y) {
+  var useX = x_or_pos,useY=y;
+  if (typeof x_or_pos == 'object') {
+    useX = x_or_pos.x;
+    useY = x_or_pos.y;
+  }
+  var entLocs = Object.keys(this.attr._entitiesByLocation);
+  var foundEnts = [];
+  if (entLocs.length < radius*radius*4) {
+    for (var i = 0; i < entLocs.length; i++) {
+      var el = entLocs[i].split(',');
+      if ((Math.abs(el[0]-useX) <= radius) && (Math.abs(el[1]-useY) <= radius)) {
+        foundEnts.push(Game.DATASTORE.ENTITY[this.attr._entitiesByLocation[entLocs[i]]]);
+      }
+    }
+  } else {
+    for (var cx = radius*-1; cx <= radius; cx++) {
+      for (var cy = radius*-1; cy <= radius; cy++) {
+        var entId = this.getEntity(useX+cx,useY+cy);
+        if (entId) {
+          foundEnts.push(Game.DATASTORE.ENTITY[entId]);
+        }
+      }
+    }
+  }
+  return foundEnts;
 };
 
 Game.Map.prototype.extractEntity = function (ent) {
@@ -104,9 +175,16 @@ Game.Map.prototype.getRandomWalkableLocation = function() {
   return this.getRandomLocation(function(t,tX,tY){ return t.isWalkable() && (!map.getEntity(tX,tY)); });
 };
 
-Game.Map.prototype.renderOn = function (display,camX,camY) {
+Game.Map.prototype.renderOn = function (display,camX,camY,showEntities,showTiles,maskRendered) {
   // console.log("display is ");
   // console.dir(display);
+
+  var entitiesVisible = (showEntities !== undefined) ? showEntities : true;
+  var tilesVisible = (showTiles !== undefined) ? showTiles : true;
+  var isMasked = (maskRendered !== undefined) ? maskRendered : false;
+
+  if (! entitiesVisible && ! tilesVisible) { return; }
+
   var dims = Game.util.getDisplayDim(display);
   var xStart = camX-Math.round(dims.w/2);
   var yStart = camY-Math.round(dims.h/2);
@@ -114,18 +192,55 @@ Game.Map.prototype.renderOn = function (display,camX,camY) {
     for (var y = 0; y < dims.h; y++) {
       // Fetch the glyph for the tile and render it to the screen - sub in wall tiles for nullTiles / out-of-bounds
       var mapPos = {x:x+xStart,y:y+yStart};
-      var tile = this.getTile(mapPos);
-      if (tile.getName() == 'nullTile') {
-        tile = Game.Tile.wallTile;
+      if (tilesVisible) {
+        var tile = this.getTile(mapPos);
+        if (tile.getName() == 'nullTile') {
+          tile = Game.Tile.wallTile;
+        }
+        tile.draw(display,x,y,isMasked);
       }
-      tile.draw(display,x,y);
-      var ent = this.getEntity(mapPos);
-      if (ent) {
-        ent.draw(display,x,y);
+      if (entitiesVisible) {
+        var ent = this.getEntity(mapPos);
+        if (ent) {
+          ent.draw(display,x,y,isMasked);
+        }
+      }
+    }
+  }
+};
+
+Game.Map.prototype.renderFovOn = function (display,camX,camY,radius) {
+  // console.log("display is ");
+  // console.dir(display);
+  var dims = Game.util.getDisplayDim(display);
+  var xStart = camX-Math.round(dims.w/2);
+  var yStart = camY-Math.round(dims.h/2);
+
+  // track fov visibility
+  var inFov = {};
+  this._fov.compute(camX,camY,radius,function(x, y, radius, visibility) {
+        inFov[x+","+y] = true;
+  });
+
+  for (var x = 0; x < dims.w; x++) {
+    for (var y = 0; y < dims.h; y++) {
+      // Fetch the glyph for the tile and render it to the screen - sub in wall tiles for nullTiles / out-of-bounds
+      var mapPos = {x:x+xStart,y:y+yStart};
+      if (inFov[mapPos.x+','+mapPos.y]) {
+        var tile = this.getTile(mapPos);
+        if (tile.getName() == 'nullTile') {
+          tile = Game.Tile.wallTile;
+        }
+        tile.draw(display,x,y);
+        var ent = this.getEntity(mapPos);
+        if (ent) {
+          ent.draw(display,x,y);
+        }
       }
     }
   }
 
+  return inFov;
 };
 
 Game.Map.prototype.toJSON = function () {

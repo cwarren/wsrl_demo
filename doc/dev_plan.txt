@@ -35,3 +35,7 @@ Later:
 Simple mobs that attack the player has two main pieces in my mind. First, a new mob that has the MeleeAttacker mixin. Second, a more interesting AI that chases the player. Probably want to fold non-standard (and different from each other) move and attack durations in this as well.
 
 'Chase the player' implies 'see the player', which means that this milestone will probably also tackle basic entity FoV and sight radius stuff (but not LoS), as well as basic pathing. Good thing the attacking part of things is nice and simple, and rot.js does a lot of the heavy lifting for FoV and LoS...
+
+... on further consideration, LoS will be the way to go over FoV.
+
+Look at array slicing for primary filter? Would need to track positions in 2D array

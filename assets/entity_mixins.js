@@ -23,10 +23,12 @@ Game.EntityMixin.PlayerMessager = {
       'damagedBy': function(evtData) {
         Game.Message.send('the '+evtData.damager.getName()+' hit you for '+evtData.damageAmount);
         Game.renderDisplayMessage();
+        Game.Message.ageMessages();
       },
       'killed': function(evtData) {
         Game.Message.send('you were killed by the '+evtData.killedBy.getName());
         Game.renderDisplayMessage();
+        Game.Message.ageMessages();
       }
     }
   }
@@ -51,6 +53,7 @@ Game.EntityMixin.PlayerActor = {
         Game.Scheduler.setDuration(this.getCurrentActionDuration());
         this.setCurrentActionDuration(this.getBaseActionDuration()+Game.util.randomInt(-5,5));
         setTimeout(function() {Game.TimeEngine.unlock();},1); // NOTE: this tiny delay ensures console output happens in the right order, which in turn means I have confidence in the turn-taking order of the various entities
+        Game.renderDisplayMessage();
         // console.log("end player acting");
       }
     }
@@ -78,7 +81,9 @@ Game.EntityMixin.PlayerActor = {
     // console.log("player pre-lock engine lock state is "+Game.TimeEngine._lock);
     if (this.isActing()) { return; } // a gate to deal with JS timing issues
     this.isActing(true);
-    Game.refresh();
+    //Game.refresh();
+    Game.renderDisplayMain();
+    Game.renderDisplayAvatar();
     Game.TimeEngine.lock();
     // console.log("player post-lock engine lock state is "+Game.TimeEngine._lock);
     this.isActing(false);
@@ -244,6 +249,26 @@ Game.EntityMixin.MeleeAttacker = {
   },
   getAttackPower: function () {
     return this.attr._MeleeAttacker_attr.attackPower;
+  }
+};
+
+Game.EntityMixin.Sight = {
+  META: {
+    mixinName: 'Sight',
+    mixinGroup: 'Sense',
+    stateNamespace: '_Sight_attr',
+    stateModel:  {
+      sightRadius: 3
+    },
+    init: function (template) {
+      this.attr._Sight_attr.sightRadius = template.sightRadius || 3;
+    }
+  },
+  getSightRadius: function () {
+    return this.attr._Sight_attr.sightRadius;
+  },
+  setSightRadius: function (n) {
+    this.attr._Sight_attr.sightRadius = n;
   }
 };
 
