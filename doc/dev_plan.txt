@@ -29,11 +29,10 @@ Later:
 - improved combat mechanics
 - ipad compatibility (capturing input, figuring out key bindings)
 
+With basic sight stuff working and with map visibility stuff out of the way it's time to make mobs a bit more interesting, by which I mean dangerous. I want a mob that will chase the avatar if it sees it. For this I'll add a new actor mixin, or perhaps alter the basic wander one.
 
-Simple mobs that attack the player has two main pieces in my mind. First, a new mob that has the MeleeAttacker mixin. Second, a more interesting AI that chases the player. Probably want to fold non-standard (and different from each other) move and attack durations in this as well.
+There's a lot of interesting stuff that can be done with mob AI, but I'm trying to resist getting pulled too far down that rabbit hole for now...
 
-FoV stuff done. It was really straight forward, which means I'm taking the time to do fancier map rendering and tracking remembered / visited tiles. This adds a LOT to the play experience.
+I'll also look at enhancing combat in general, with separate hit checks and damage checks.
 
-Things to consider
-- method canSee on Sight mixin - whether this entity can see the given coordinate (or entity, perhaps? former is more general, latter is probably the most common use, suggest both...)
-- message the player when visible entities interact / act, which means maybe have a way of tracking which things are visible to the player and making use of it...? Hmm.... will require more thinking.... might be too complex for this stage of development...
+BUG: when an entity is at a movement limit (e.g. map 10,0) and tries to move beyond that limit (e.g. move (0,-1) it 'bumps' itself, and diagonal moves slide left or right. This is, I think, and artifact of the way movement clamping is handled.

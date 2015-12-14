@@ -57,7 +57,7 @@ Game.EntityMixin.PlayerActor = {
         // console.log("end player acting");
       },
       'killed': function(evtData) {
-        Game.TimeEngine.lock();
+        //Game.TimeEngine.lock();
         Game.switchUiMode("gameLose");
       }
     }
@@ -97,37 +97,34 @@ Game.EntityMixin.PlayerActor = {
 Game.EntityMixin.WalkerCorporeal = {
   META: {
     mixinName: 'WalkerCorporeal',
-    mixinGroup: 'Walker'
-  },
-  tryWalk: function (map,dx,dy) {
-    var targetX = Math.min(Math.max(0,this.getX() + dx),map.getWidth()-1);
-    var targetY = Math.min(Math.max(0,this.getY() + dy),map.getHeight()-1);
-    // console.log('tryWalk deltas: '+dx+','+dy+' '+this.getName());
-    // console.log('tryWalk initial pos: '+this.getX()+','+this.getY()+' '+this.getName());
-    // console.log('tryWalk: '+targetX+','+targetY+' '+this.getName());
-
-    if (map.getEntity(targetX,targetY)) { // can't walk into spaces occupied by other entities
-      // console.log('tryWalk - bump: '+this.getName());
-      this.raiseEntityEvent('bumpEntity',{actor:this,recipient:map.getEntity(targetX,targetY)});
-      // NOTE: should bumping an entity always take a turn? might have to get some return data from the event (once event return data is implemented)
-      return true;
-    }
-    var targetTile = map.getTile(targetX,targetY);
-    if (targetTile.isWalkable()) {
-      // console.log('tryWalk - walkable: '+this.getName());
-      this.setPos(targetX,targetY);
-      var myMap = this.getMap();
-      if (myMap) {
-        // console.log('tryWalk - myMap.updateEntityLocation: '+this.getName());
-        myMap.updateEntityLocation(this);
+    mixinGroup: 'Walker',
+    listeners: {
+      'adjacentMove': function(evtData) {
+          // console.log('listener adjacentMove');
+          // console.dir(JSON.parse(JSON.stringify(evtData)));
+          var map = this.getMap();
+          var dx=evtData.dx,dy=evtData.dy;
+          var targetX = Math.min(Math.max(0,this.getX() + dx),map.getWidth()-1);
+          var targetY = Math.min(Math.max(0,this.getY() + dy),map.getHeight()-1);
+          if (map.getEntity(targetX,targetY)) { // can't walk into spaces occupied by other entities
+            this.raiseEntityEvent('bumpEntity',{actor:this,recipient:map.getEntity(targetX,targetY)});
+            // NOTE: should bumping an entity always take a turn? might have to get some return data from the event (once event return data is implemented)
+            return {madeAdjacentMove:true};
+          }
+          var targetTile = map.getTile(targetX,targetY);
+          if (targetTile.isWalkable()) {
+            this.setPos(targetX,targetY);
+            var myMap = this.getMap();
+            if (myMap) {
+              myMap.updateEntityLocation(this);
+            }
+            return {madeAdjacentMove:true};
+          } else {
+            this.raiseEntityEvent('walkForbidden',{target:targetTile});
+          }
+          return {madeAdjacentMove:false};
       }
-      // console.log('tryWalk post movement pos: '+this.getX()+','+this.getY()+' '+this.getName());
-      return true;
-    } else {
-      // console.log('tryWalk - walkForbidden: '+this.getName());
-      this.raiseEntityEvent('walkForbidden',{target:targetTile});
     }
-    return false;
   }
 };
 
@@ -384,10 +381,7 @@ Game.EntityMixin.WanderActor = {
     // console.log("begin wander acting");
     // console.log('wander for '+this.getName());
     var moveDeltas = this.getMoveDeltas();
-    if (this.hasMixin('Walker')) { // NOTE: this pattern suggests that maybe tryWalk shoudl be converted to an event
-      // console.log('trying to walk to '+moveDeltas.x+','+moveDeltas.y);
-      this.tryWalk(this.getMap(), moveDeltas.x, moveDeltas.y);
-    }
+    this.raiseEntityEvent('adjacentMove',{dx:moveDeltas.x,dy:moveDeltas.y});
     Game.Scheduler.setDuration(this.getCurrentActionDuration());
     this.setCurrentActionDuration(this.getBaseActionDuration()+Game.util.randomInt(-10,10));
     this.raiseEntityEvent('actionDone');

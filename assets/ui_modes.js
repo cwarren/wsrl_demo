@@ -294,8 +294,11 @@ Game.UIMode.gamePlay = {
     display.drawText(1,2,Game.UIMode.DEFAULT_COLOR_STR+"avatar x: "+this.getAvatar().getX()); // DEV
     display.drawText(1,3,Game.UIMode.DEFAULT_COLOR_STR+"avatar y: "+this.getAvatar().getY()); // DEV
   },
-  moveAvatar: function (dx,dy) {
-    if (this.getAvatar().tryWalk(this.getMap(),dx,dy)) {
+  moveAvatar: function (pdx,pdy) {
+    // console.log('moveAvatar '+pdx+','+pdy);
+    var moveResp = this.getAvatar().raiseEntityEvent('adjacentMove',{dx:pdx,dy:pdy});
+    // if (this.getAvatar().tryWalk(this.getMap(),dx,dy)) {
+    if (moveResp.madeAdjacentMove && moveResp.madeAdjacentMove[0]) {
       this.setCameraToAvatar();
       return true;
     }
