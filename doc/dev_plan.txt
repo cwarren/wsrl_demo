@@ -12,8 +12,6 @@ Some of the tasks that would need to be done for a full game aren't really neces
 Base game:
 - mobs that attack the player, enhanced combat
 - real game win / lose conditions
-- map visibility limits; FOV, LOS, and all that jazz
-- remembered map
 - map modification - digging
 - items & active symbols
 - hunger, food, and eating
@@ -35,3 +33,7 @@ Later:
 Simple mobs that attack the player has two main pieces in my mind. First, a new mob that has the MeleeAttacker mixin. Second, a more interesting AI that chases the player. Probably want to fold non-standard (and different from each other) move and attack durations in this as well.
 
 FoV stuff done. It was really straight forward, which means I'm taking the time to do fancier map rendering and tracking remembered / visited tiles. This adds a LOT to the play experience.
+
+Things to consider
+- method canSee on Sight mixin - whether this entity can see the given coordinate (or entity, perhaps? former is more general, latter is probably the most common use, suggest both...)
+- message the player when visible entities interact / act, which means maybe have a way of tracking which things are visible to the player and making use of it...? Hmm.... will require more thinking.... might be too complex for this stage of development...
