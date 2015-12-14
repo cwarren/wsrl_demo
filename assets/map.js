@@ -12,8 +12,7 @@ Game.Map = function (mapTileSetName,presetId) {
     _width: this._tiles.length,
     _height: this._tiles[0].length,
     _entitiesByLocation: {},
-    _locationsByEntity: {},
-    _rememberedCoords: {}
+    _locationsByEntity: {}
   };
 
   this._fov = null;
@@ -156,14 +155,14 @@ Game.Map.prototype.rememberCoords = function (toRemember) {
   }
 };
 
-Game.Map.prototype.renderOn = function (display,camX,camY,showEntities,showTiles,maskRendered,memoryOnly) {
-  // console.log("display is ");
-  // console.dir(display);
+Game.Map.prototype.renderOn = function (display,camX,camY,renderOptions) { //visibleCells,showEntities,showTiles,maskRendered,memoryOnly) {
+  var opt = renderOptions || {};
 
-  var entitiesVisible = (showEntities !== undefined) ? showEntities : true;
-  var tilesVisible = (showTiles !== undefined) ? showTiles : true;
-  var isMasked = (maskRendered !== undefined) ? maskRendered : false;
-  var filterForRemembered = (memoryOnly !== undefined) ? memoryOnly : true;
+  var checkCellVisibility = opt.visibleCells !== undefined;
+  var visibleCells = opt.visibleCells || {};
+  var entitiesVisible = (opt.showEntities !== undefined) ? opt.showEntities : true;
+  var tilesVisible = (opt.showTiles !== undefined) ? opt.showTiles : true;
+  var isMasked = (opt.maskRendered !== undefined) ? opt.maskRendered : false;
 
   if (! entitiesVisible && ! tilesVisible) { return; }
 
@@ -172,13 +171,14 @@ Game.Map.prototype.renderOn = function (display,camX,camY,showEntities,showTiles
   var yStart = camY-Math.round(dims.h/2);
   for (var x = 0; x < dims.w; x++) {
     for (var y = 0; y < dims.h; y++) {
-      // Fetch the glyph for the tile and render it to the screen - sub in wall tiles for nullTiles / out-of-bounds
       var mapPos = {x:x+xStart,y:y+yStart};
-      if (filterForRemembered) {
-        if (! this.attr._rememberedCoords[mapPos.x+','+mapPos.y]) {
+
+      if (checkCellVisibility) {
+        if (! visibleCells[mapPos.x+','+mapPos.y]) {
           continue;
         }
       }
+
       if (tilesVisible) {
         var tile = this.getTile(mapPos);
         if (tile.getName() == 'nullTile') {
@@ -186,6 +186,7 @@ Game.Map.prototype.renderOn = function (display,camX,camY,showEntities,showTiles
         }
         tile.draw(display,x,y,isMasked);
       }
+
       if (entitiesVisible) {
         var ent = this.getEntity(mapPos);
         if (ent) {
