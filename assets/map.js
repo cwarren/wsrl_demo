@@ -158,13 +158,18 @@ Game.Map.prototype.rememberCoords = function (toRemember) {
 Game.Map.prototype.renderOn = function (display,camX,camY,renderOptions) { //visibleCells,showEntities,showTiles,maskRendered,memoryOnly) {
   var opt = renderOptions || {};
 
-  var checkCellVisibility = opt.visibleCells !== undefined;
+  var checkCellsVisible = opt.visibleCells !== undefined;
   var visibleCells = opt.visibleCells || {};
-  var entitiesVisible = (opt.showEntities !== undefined) ? opt.showEntities : true;
-  var tilesVisible = (opt.showTiles !== undefined) ? opt.showTiles : true;
-  var isMasked = (opt.maskRendered !== undefined) ? opt.maskRendered : false;
+  var showVisibleEntities = (opt.showVisibleEntities !== undefined) ? opt.showVisibleEntities : true;
+  var showVisibleTiles = (opt.showVisibleTiles !== undefined) ? opt.showVisibleTiles : true;
 
-  if (! entitiesVisible && ! tilesVisible) { return; }
+  var checkCellsMasked = opt.maskedCells !== undefined;
+  var maskedCells = opt.maskedCells || {};
+  var showMaskedEntities = (opt.showMaskedEntities !== undefined) ? opt.showMaskedEntities : false;
+  var showMaskedTiles = (opt.showMaskedTiles !== undefined) ? opt.showMaskedTiles : true;
+
+
+  if (! (showVisibleEntities || showVisibleTiles || showMaskedEntities || showMaskedTiles)) { return; }
 
   var dims = Game.util.getDisplayDim(display);
   var xStart = camX-Math.round(dims.w/2);
@@ -172,25 +177,28 @@ Game.Map.prototype.renderOn = function (display,camX,camY,renderOptions) { //vis
   for (var x = 0; x < dims.w; x++) {
     for (var y = 0; y < dims.h; y++) {
       var mapPos = {x:x+xStart,y:y+yStart};
+      var mapCoord = mapPos.x+','+mapPos.y;
 
-      if (checkCellVisibility) {
-        if (! visibleCells[mapPos.x+','+mapPos.y]) {
-          continue;
-        }
+      if (! ((checkCellsVisible && visibleCells[mapCoord]) || (checkCellsMasked && maskedCells[mapCoord]))) {
+        continue;
       }
 
-      if (tilesVisible) {
-        var tile = this.getTile(mapPos);
-        if (tile.getName() == 'nullTile') {
-          tile = Game.Tile.wallTile;
-        }
-        tile.draw(display,x,y,isMasked);
+      var tile = this.getTile(mapPos);
+      if (tile.getName() == 'nullTile') {
+        tile = Game.Tile.wallTile;
+      }
+      if (showVisibleTiles && visibleCells[mapCoord]) {
+        tile.draw(display,x,y);
+      } else if (showMaskedTiles && maskedCells[mapCoord]) {
+        tile.draw(display,x,y,true);
       }
 
-      if (entitiesVisible) {
-        var ent = this.getEntity(mapPos);
-        if (ent) {
-          ent.draw(display,x,y,isMasked);
+      var ent = this.getEntity(mapPos);
+      if (ent) {
+        if (showVisibleEntities && visibleCells[mapCoord]) {
+          ent.draw(display,x,y);
+        } else if (showMaskedEntities && maskedCells[mapCoord]) {
+          ent.draw(display,x,y,true);
         }
       }
     }

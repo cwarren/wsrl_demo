@@ -204,6 +204,9 @@ Game.UIMode.gamePersistence = {
 Game.UIMode.gameWin = {
   enter: function () {
     console.log('game winning');
+    Game.TimeEngine.lock();
+    Game.renderDisplayAvatar();
+    Game.renderDisplayMain();
   },
   exit: function () {
   },
@@ -225,6 +228,9 @@ Game.UIMode.gameWin = {
 Game.UIMode.gameLose = {
   enter: function () {
     console.log('game losing');
+    Game.TimeEngine.lock();
+    Game.renderDisplayAvatar();
+    Game.renderDisplayMain();
   },
   exit: function () {
   },
@@ -277,14 +283,11 @@ Game.UIMode.gamePlay = {
     this.attr._avatarId = a.getId();
   },
   render: function (display) {
-    var fg = Game.UIMode.DEFAULT_COLOR_FG;
-    var bg = Game.UIMode.DEFAULT_COLOR_BG;
-    //this.getMap().renderOn(display,this.attr._cameraX,this.attr._cameraY);
-    this.getMap().renderOn(display,this.attr._cameraX,this.attr._cameraY,
-      {showEntities:false,showTiles:true,maskRendered:true,visibleCells:this.getAvatar().getRememberedCoordsForMap()});
     var seenCells = this.getAvatar().getVisibleCells();
-    this.getMap().renderOn(display,this.attr._cameraX,this.attr._cameraY,
-      {showEntities:true,showTiles:true,visibleCells:seenCells});
+    this.getMap().renderOn(display,this.attr._cameraX,this.attr._cameraY,{
+      visibleCells:seenCells,
+      maskedCells:this.getAvatar().getRememberedCoordsForMap()
+      });
     this.getAvatar().rememberCoords(seenCells);
   },
   renderAvatarInfo: function (display) {

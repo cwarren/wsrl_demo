@@ -55,6 +55,10 @@ Game.EntityMixin.PlayerActor = {
         setTimeout(function() {Game.TimeEngine.unlock();},1); // NOTE: this tiny delay ensures console output happens in the right order, which in turn means I have confidence in the turn-taking order of the various entities
         Game.renderDisplayMessage();
         // console.log("end player acting");
+      },
+      'killed': function(evtData) {
+        Game.TimeEngine.lock();
+        Game.switchUiMode("gameLose");
       }
     }
   },
