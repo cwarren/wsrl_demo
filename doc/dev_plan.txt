@@ -10,8 +10,6 @@ Addendum: Which bites are taken when is key to success.
 
 Some of the tasks that would need to be done for a full game aren't really necessary for a base game, so I'm (at least for now) setting them aside. I'm also far enough along that I'm going to put a bit of thought into ordering the milestone list at this point.
 Base game:
-- mobs that attack the player, enhanced combat
-- real game win / lose conditions
 - items & active symbols, inventory
 - hunger, food, and eating
 - equipment
@@ -34,6 +32,10 @@ With basic sight stuff working and with map visibility stuff out of the way it's
 There's a lot of interesting stuff that can be done with mob AI, but I'm trying to resist getting pulled too far down that rabbit hole for now...
 
 I'll also look at enhancing combat in general, with separate hit checks and damage checks.
+
+DONE- combat attack vs defense is pretty simple - attack hit vs defender avoid. Damage is also simple- damage dealt - damage mitigated.
+
+Went ahead and added a win condition in the mix as well - it was a small thing.
 
 FIXED BUG: when an entity is at a movement limit (e.g. map 10,0) and tries to move beyond that limit (e.g. move (0,-1) it 'bumps' itself, and diagonal moves slide left or right. This is, I think, and artifact of the way movement clamping is handled.
 Fix was a simple early cut out if the attempted location was out of bounds (instead of a value clamp at the bounds)

@@ -66,6 +66,15 @@ Game.EntityMixin.PlayerActor = {
         Game.renderDisplayMessage();
         // console.log("end player acting");
       },
+      'madeKill': function(evtData) {
+        var self = this;
+        setTimeout(function() { // NOTE: this tiny delay ensures event calls happen in the right order (yes, this is a bit of a hack... might be better to make a postChronicalKill event, though that's also a bit of a hack...)
+          var victoryCheckResp = self.raiseEntityEvent('calcKillsOf',{entityName:'attack slug'});
+          if (Game.util.compactNumberArray_add(victoryCheckResp.killCount) >= 3) {
+            Game.switchUiMode("gameWin");
+          }
+        },1);
+      },
       'killed': function(evtData) {
         //Game.TimeEngine.lock();
         Game.switchUiMode("gameLose");
@@ -167,6 +176,9 @@ Game.EntityMixin.Chronicle = {
       },
       'killed': function(evtData) {
         this.attr._Chronicle_attr.deathMessage = 'killed by '+evtData.killedBy.getName();
+      },
+      'calcKillsOf': function (evtData) {
+        return {killCount:this.getKillsOf(evtData.entityName)};
       }
     }
   },
@@ -181,6 +193,9 @@ Game.EntityMixin.Chronicle = {
   },
   getKills: function () {
     return this.attr._Chronicle_attr.killLog;
+  },
+  getKillsOf: function (entityName) {
+    return this.attr._Chronicle_attr.killLog[entityName] || 0;
   },
   clearKills: function () {
     this.attr._Chronicle_attr.killLog = {};
@@ -266,7 +281,7 @@ Game.EntityMixin.MeleeAttacker = {
         // console.log('MeleeAttacker bumpEntity');
         var hitValResp = this.raiseEntityEvent('calcAttackHit');
         var avoidValResp = evtData.recipient.raiseEntityEvent('calcAttackAvoid');
-        Game.util.cdebug(avoidValResp);
+        // Game.util.cdebug(avoidValResp);
         var hitVal = Game.util.compactNumberArray_add(hitValResp.attackHit);
         var avoidVal = Game.util.compactNumberArray_add(avoidValResp.attackAvoid);
         if (ROT.RNG.getUniform()*(hitVal+avoidVal) > avoidVal) {

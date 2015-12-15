@@ -379,6 +379,7 @@ Game.UIMode.gamePlay = {
       this.getMap().addEntity(Game.EntityGenerator.create('attack slug'),this.getMap().getRandomWalkableLocation());
     }
 
+    Game.Message.send("Kill 3 or more attack slugs to win!");
   },
   toJSON: function() {
     return Game.UIMode.gamePersistence.BASE_toJSON.call(this);
