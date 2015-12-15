@@ -12,13 +12,13 @@ Some of the tasks that would need to be done for a full game aren't really neces
 Base game:
 - mobs that attack the player, enhanced combat
 - real game win / lose conditions
-- map modification - digging
-- items & active symbols
+- items & active symbols, inventory
 - hunger, food, and eating
 - equipment
 - treasure drops
 - improved map generation - random seeds for maps? seeding items?
 Later:
+- map modification - digging
 - ongoing actions
 - avatar advancement - experience and improvement
 - game scoring

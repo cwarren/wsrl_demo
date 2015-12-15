@@ -138,12 +138,16 @@ var Game = {
     this._display.message.o.clear();
     this._display.message.o.drawText(1,1,'%c{#fff}%b{#000}'+msg,79);
   },
-  
+
   eventHandler: function (eventType, evt) {
     // When an event is received have the current ui handle it
     if (this.getCurUiMode() !== null) {
         this.getCurUiMode().handleInput(eventType, evt);
     }
+  },
+
+  getAvatar: function () {
+    return Game.UIMode.gamePlay.getAvatar();
   },
 
   getCurUiMode: function () {

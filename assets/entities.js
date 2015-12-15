@@ -4,6 +4,7 @@ Game.EntityGenerator.learn({
   name: 'avatar',
   chr:'@',
   fg:'#dda',
+  sightRadius: 5,
   maxHp: 10,
   mixins: ["PlayerActor", "PlayerMessager", "WalkerCorporeal", "Sight", "MapMemory", "HitPoints", "Chronicle", "MeleeAttacker"]
 });
@@ -31,4 +32,16 @@ Game.EntityGenerator.learn({
   maxHp: 3,
   attackPower: 2,
   mixins: ["HitPoints", "WanderActor", "WalkerCorporeal", "MeleeAttacker"]
+});
+
+Game.EntityGenerator.learn({
+  name: 'attack slug',
+  chr:'~',
+  fg:'#ff9',
+  maxHp: 4,
+  sightRadius: 4,
+  attackPower: 1,
+  wanderChaserActionDuration: 1200,
+  attackActionDuration: 3000,
+  mixins: ["HitPoints", "Sight", "WanderChaserActor", "WalkerCorporeal", "MeleeAttacker"]
 });
