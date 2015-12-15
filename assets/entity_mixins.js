@@ -12,6 +12,16 @@ Game.EntityMixin.PlayerMessager = {
         Game.renderDisplayMessage();
         Game.Message.ageMessages();
       },
+
+      'attackAvoided': function(evtData) {
+        Game.Message.send('you avoided the '+evtData.attacker.getName());
+        Game.renderDisplayMessage();
+        Game.Message.ageMessages(); // NOTE: maybe not do this? If surrounded by multiple attackers messages could be aged out before being seen...
+      },
+      'attackMissed': function(evtData) {
+        Game.Message.send('you missed the '+evtData.recipient.getName());
+        Game.renderDisplayMessage();
+      },
       'dealtDamage': function(evtData) {
         Game.Message.send('you hit the '+evtData.damagee.getName()+' for '+evtData.damageAmount);
         Game.renderDisplayMessage();
@@ -23,7 +33,7 @@ Game.EntityMixin.PlayerMessager = {
       'damagedBy': function(evtData) {
         Game.Message.send('the '+evtData.damager.getName()+' hit you for '+evtData.damageAmount);
         Game.renderDisplayMessage();
-        Game.Message.ageMessages();
+        Game.Message.ageMessages();  // NOTE: maybe not do this? If surrounded by multiple attackers messages could be aged out before being seen...
       },
       'killed': function(evtData) {
         Game.Message.send('you were killed by the '+evtData.killedBy.getName());
@@ -203,9 +213,9 @@ Game.EntityMixin.HitPoints = {
       'attacked': function(evtData) {
         // console.log('HitPoints attacked');
 
-        this.takeHits(evtData.attackPower);
-        this.raiseEntityEvent('damagedBy',{damager:evtData.attacker,damageAmount:evtData.attackPower});
-        evtData.attacker.raiseEntityEvent('dealtDamage',{damagee:this,damageAmount:evtData.attackPower});
+        this.takeHits(evtData.attackDamage);
+        this.raiseEntityEvent('damagedBy',{damager:evtData.attacker,damageAmount:evtData.attackDamage});
+        evtData.attacker.raiseEntityEvent('dealtDamage',{damagee:this,damageAmount:evtData.attackDamage});
         if (this.getCurHp() <= 0) {
           this.raiseEntityEvent('killed',{entKilled: this, killedBy: evtData.attacker});
           evtData.attacker.raiseEntityEvent('madeKill',{entKilled: this, killedBy: evtData.attacker});
@@ -243,23 +253,81 @@ Game.EntityMixin.MeleeAttacker = {
     mixinGroup: 'Attacker',
     stateNamespace: '_MeleeAttacker_attr',
     stateModel:  {
-      attackPower: 1,
+      attackHit: 1,
+      attackDamage: 1,
       attackActionDuration: 1000
     },
     init: function (template) {
-      this.attr._MeleeAttacker_attr.attackPower = template.attackPower || 1;
+      this.attr._MeleeAttacker_attr.attackDamage = template.attackDamage || 1;
       this.attr._MeleeAttacker_attr.attackActionDuration = template.attackActionDuration || 1000;
     },
     listeners: {
       'bumpEntity': function(evtData) {
         // console.log('MeleeAttacker bumpEntity');
-        evtData.recipient.raiseEntityEvent('attacked',{attacker:evtData.actor,attackPower:this.getAttackPower()});
+        var hitValResp = this.raiseEntityEvent('calcAttackHit');
+        var avoidValResp = evtData.recipient.raiseEntityEvent('calcAttackAvoid');
+        Game.util.cdebug(avoidValResp);
+        var hitVal = Game.util.compactNumberArray_add(hitValResp.attackHit);
+        var avoidVal = Game.util.compactNumberArray_add(avoidValResp.attackAvoid);
+        if (ROT.RNG.getUniform()*(hitVal+avoidVal) > avoidVal) {
+          var hitDamageResp = this.raiseEntityEvent('calcAttackDamage');
+          var damageMitigateResp = evtData.recipient.raiseEntityEvent('calcDamageMitigation');
+
+          evtData.recipient.raiseEntityEvent('attacked',{attacker:evtData.actor,attackDamage:Game.util.compactNumberArray_add(hitDamageResp.attackDamage) - Game.util.compactNumberArray_add(damageMitigateResp.damageMitigation)});
+        } else {
+          evtData.recipient.raiseEntityEvent('attackAvoided',{attacker:evtData.actor,recipient:evtData.recipient});
+          evtData.actor.raiseEntityEvent('attackMissed',{attacker:evtData.actor,recipient:evtData.recipient});
+        }
         this.setCurrentActionDuration(this.attr._MeleeAttacker_attr.attackActionDuration);
+      },
+      'calcAttackHit': function(evtData) {
+        // console.log('MeleeAttacker bumpEntity');
+        return {attackHit:this.getAttackHit()};
+      },
+      'calcAttackDamage': function(evtData) {
+        // console.log('MeleeAttacker bumpEntity');
+        return {attackDamage:this.getAttackDamage()};
+      }
+
+    }
+  },
+  getAttackHit: function () {
+    return this.attr._MeleeAttacker_attr.attackHit;
+  },
+  getAttackDamage: function () {
+    return this.attr._MeleeAttacker_attr.attackDamage;
+  }
+};
+
+Game.EntityMixin.MeleeDefender = {
+  META: {
+    mixinName: 'MeleeDefender',
+    mixinGroup: 'Defender',
+    stateNamespace: '_MeleeDefenderr_attr',
+    stateModel:  {
+      attackAvoid: 0,
+      damageMitigation: 0
+    },
+    init: function (template) {
+      this.attr._MeleeDefenderr_attr.attackAvoid = template.attackAvoid || 0;
+      this.attr._MeleeDefenderr_attr.damageMitigation = template.damageMitigation || 0;
+    },
+    listeners: {
+      'calcAttackAvoid': function(evtData) {
+        // console.log('MeleeDefender calcAttackAvoid');
+        return {attackAvoid:this.getAttackAvoid()};
+      },
+      'calcDamageMitigation': function(evtData) {
+        // console.log('MeleeAttacker bumpEntity');
+        return {damageMitigation:this.getDamageMitigation()};
       }
     }
   },
-  getAttackPower: function () {
-    return this.attr._MeleeAttacker_attr.attackPower;
+  getAttackAvoid: function () {
+    return this.attr._MeleeDefenderr_attr.attackAvoid;
+  },
+  getDamageMitigation: function () {
+    return this.attr._MeleeDefenderr_attr.damageMitigation;
   }
 };
 

@@ -79,6 +79,22 @@ Game.util = {
       ret = ret && ar[i];
     }
     return ret;
-  }
+  },
 
+  compactNumberArray_add: function (ar) {
+    if (! ar) { return 0; }
+    var ret = 0;
+    for (var i = 0; i < ar.length; i++) {
+      ret += ar[i];
+    }
+    return ret;
+  },
+  compactNumberArray_mult: function (ar) {
+    if (! ar) { return 1; }
+    var ret = 1;
+    for (var i = 0; i < ar.length; i++) {
+      ret *= ar[i];
+    }
+    return ret;
+  }
 };
