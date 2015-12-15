@@ -104,8 +104,15 @@ Game.EntityMixin.WalkerCorporeal = {
           // console.dir(JSON.parse(JSON.stringify(evtData)));
           var map = this.getMap();
           var dx=evtData.dx,dy=evtData.dy;
-          var targetX = Math.min(Math.max(0,this.getX() + dx),map.getWidth()-1);
-          var targetY = Math.min(Math.max(0,this.getY() + dy),map.getHeight()-1);
+          // var targetX = Math.min(Math.max(0,this.getX() + dx),map.getWidth()-1);
+          // var targetY = Math.min(Math.max(0,this.getY() + dy),map.getHeight()-1);
+          var targetX = this.getX() + dx;
+          var targetY = this.getY() + dy;
+          if ((targetX < 0) || (targetX >= map.getWidth()) || (targetY < 0) || (targetY >= map.getHeight())) {
+            this.raiseEntityEvent('walkForbidden',{target:Game.Tile.nullTile});
+            return {madeAdjacentMove:false};
+          }
+
           if (map.getEntity(targetX,targetY)) { // can't walk into spaces occupied by other entities
             this.raiseEntityEvent('bumpEntity',{actor:this,recipient:map.getEntity(targetX,targetY)});
             // NOTE: should bumping an entity always take a turn? might have to get some return data from the event (once event return data is implemented)

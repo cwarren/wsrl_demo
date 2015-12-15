@@ -35,4 +35,5 @@ There's a lot of interesting stuff that can be done with mob AI, but I'm trying 
 
 I'll also look at enhancing combat in general, with separate hit checks and damage checks.
 
-BUG: when an entity is at a movement limit (e.g. map 10,0) and tries to move beyond that limit (e.g. move (0,-1) it 'bumps' itself, and diagonal moves slide left or right. This is, I think, and artifact of the way movement clamping is handled.
+FIXED BUG: when an entity is at a movement limit (e.g. map 10,0) and tries to move beyond that limit (e.g. move (0,-1) it 'bumps' itself, and diagonal moves slide left or right. This is, I think, and artifact of the way movement clamping is handled.
+Fix was a simple early cut out if the attempted location was out of bounds (instead of a value clamp at the bounds)
