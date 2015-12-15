@@ -10,11 +10,15 @@ Addendum: Which bites are taken when is key to success.
 
 Some of the tasks that would need to be done for a full game aren't really necessary for a base game, so I'm (at least for now) setting them aside. I'm also far enough along that I'm going to put a bit of thought into ordering the milestone list at this point.
 Base game:
-- items & active symbols, inventory
+- items & active symbols
+- inventory
+- avatar info display (more than just map coords)
+- item and entity descriptions; calculating item and entity stats for player viewing
 - hunger, food, and eating
+- looking at things (targeting)
 - equipment
+- improved map generation - random seeds for maps? seeding items? connected maps?
 - treasure drops
-- improved map generation - random seeds for maps? seeding items?
 Later:
 - map modification - digging
 - ongoing actions
@@ -27,15 +31,14 @@ Later:
 - improved combat mechanics
 - ipad compatibility (capturing input, figuring out key bindings)
 
-With basic sight stuff working and with map visibility stuff out of the way it's time to make mobs a bit more interesting, by which I mean dangerous. I want a mob that will chase the avatar if it sees it. For this I'll add a new actor mixin, or perhaps alter the basic wander one.
+There are three large pieces to this next chunk of work:
+- pulling mixin stuff out of entity and up a level (to an intermediary between Symbol and Entity)
+- putting item code structures in place (similar to entities) and creating a first item
+- altering the map to have items on it (and the render system to handle them)
 
-There's a lot of interesting stuff that can be done with mob AI, but I'm trying to resist getting pulled too far down that rabbit hole for now...
+Originally I'd lumped inventory stuff in with this, but I think that would make this milestone too large and diverse.
 
-I'll also look at enhancing combat in general, with separate hit checks and damage checks.
-
-DONE- combat attack vs defense is pretty simple - attack hit vs defender avoid. Damage is also simple- damage dealt - damage mitigated.
-
-Went ahead and added a win condition in the mix as well - it was a small thing.
-
-FIXED BUG: when an entity is at a movement limit (e.g. map 10,0) and tries to move beyond that limit (e.g. move (0,-1) it 'bumps' itself, and diagonal moves slide left or right. This is, I think, and artifact of the way movement clamping is handled.
-Fix was a simple early cut out if the attempted location was out of bounds (instead of a value clamp at the bounds)
+Inventory (which happens next, most likely) will cover:
+- More new commands!-  pick up an item, drop an item (for this step 'inventory' will hold a single thing)
+- Container item mixin, and using an item with that for the player's inventory
+- new ui mode layer - inventory management (with new command!- manage inventory)
