@@ -18,13 +18,14 @@ Base game:
 - looking at things (targeting)
 - equipment
 - improved map generation - random seeds for maps? seeding items? connected maps?
-- treasure drops
+- improved map persistence - saving the RNG state
 Later:
+- random tables (ways of selecting at random from a weighted and possibly dynamic set)
+- treasure drops
 - map modification - digging
 - ongoing actions
 - avatar advancement - experience and improvement
 - game scoring
-- random tables (ways of selecting at random from a weighted and possibly dynamic set)
 - multiple maps and moving between them
 - improved map tiles and generation - more tile types, variable digging
 - throwing things & ranged combat
@@ -35,6 +36,18 @@ There are three large pieces to this next chunk of work:
 - pulling mixin stuff out of entity and up a level (to an intermediary between Symbol and Entity)
 - putting item code structures in place (similar to entities) and creating a first item
 - altering the map to have items on it (and the render system to handle them)
+
+Entities and items have a lot in common in terms of the way they work. I think it makes sense to use two different classes for them, but I'm not entirely sure... but that's the way I'm going for now. To take advantage of the parts that I want to overlap I'm going to pull a bunch of stuff out of Entity and into a superclass that will sit between Entity and Symbol - call it ActiveSymbol. ActiveSymbol will then also be the parent of Item. The big things that ActiveSymbol will provide are: mixin support, event support, and persistence implementation.
+
+Once that work is done I'll create a very, very simple first item - a rock. It will have no mixins and will generally be very boring because it's only purpose really is to make sure the ActiveSymbol stuff is working.
+
+Finally, I'll work on Map. I'll need methods relating to Items that are similar to the methods relating to Entities. One of the big differences here is that there will be able to be more than one item in a given map space. Since items don't block movement or vision I won't need to get into the entity mixins that deal with those things.
+
+Finally, I'll have to make sure persistence is working.
+
+When all that is done there will be several rocks scattered about the cave when the game is played, though the avatar can't yet interact with any of them.
+
+---------------------------
 
 Originally I'd lumped inventory stuff in with this, but I think that would make this milestone too large and diverse.
 
