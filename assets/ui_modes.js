@@ -296,7 +296,7 @@ Game.UIMode.gamePlay = {
   },
   moveAvatar: function (pdx,pdy) {
     // console.log('moveAvatar '+pdx+','+pdy);
-    var moveResp = this.getAvatar().raiseEntityEvent('adjacentMove',{dx:pdx,dy:pdy});
+    var moveResp = this.getAvatar().raiseSymbolActiveEvent('adjacentMove',{dx:pdx,dy:pdy});
     // if (this.getAvatar().tryWalk(this.getMap(),dx,dy)) {
     if (moveResp.madeAdjacentMove && moveResp.madeAdjacentMove[0]) {
       this.setCameraToAvatar();
@@ -358,7 +358,7 @@ Game.UIMode.gamePlay = {
     }
 
     if (tookTurn) {
-      this.getAvatar().raiseEntityEvent('actionDone');
+      this.getAvatar().raiseSymbolActiveEvent('actionDone');
       Game.Message.ageMessages();
       return true;
     }
