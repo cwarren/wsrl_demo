@@ -6,10 +6,11 @@ Game.SymbolActive = function(template) {
 
   // mixin sutff
   // track mixins and groups, copy over non-META properties, and run the mixin init if it exists
+  // NOTE: this._mixinSet is set up / defined by the sub-class (see Entity for example)
   this._mixinNames = template.mixins || [];
   this._mixins = [];
   for (var i = 0; i < this._mixinNames.length; i++) {
-    this._mixins.push(Game.EntityMixin[this._mixinNames[i]]);
+    this._mixins.push(this._mixinSet[this._mixinNames[i]]);
   }
   this._mixinTracker = {};
   // console.dir(template);

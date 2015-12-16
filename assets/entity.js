@@ -4,6 +4,7 @@ Game.Entity = function(template) {
     template = template || {};
     // console.log("creating entity using template");
     // console.dir(template);
+    this._mixinSet = Game.EntityMixin;
     Game.SymbolActive.call(this, template);
     // if (! ('attr' in this)) { this.attr = {}; }
     // this.attr._name = template.name || '';
