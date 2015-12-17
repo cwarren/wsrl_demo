@@ -108,11 +108,7 @@ Game.UIMode.gamePersistence = {
       var json_state_data = window.localStorage.getItem(Game._PERSISTANCE_NAMESPACE);
       var state_data = JSON.parse(json_state_data);
 
-      Game.DATASTORE = {};
-      Game.DATASTORE.MAP = {};
-      Game.DATASTORE.ENTITY = {};
-      Game.initializeTimingEngine();
-      // NOTE: the timing stuff is initialized here because we need to ensure that the stuff exists when entities are created, but the actual schedule restoration re-runs timing initialization
+      this._resetGameDataStructures();
 
       // game level stuff
       Game.setRandomSeed(state_data[this.RANDOM_SEED_KEY]);
@@ -138,12 +134,23 @@ Game.UIMode.gamePersistence = {
         }
       }
 
+      // items
+      for (var itemId in state_data.ITEM) {
+        if (state_data.ITEM.hasOwnProperty(itemId)) {
+          var itemAttr = JSON.parse(state_data.ITEM[itemId]);
+          var newI = Game.ItemGenerator.create(itemAttr._generator_template_key,itemAttr._id);
+          Game.DATASTORE.ITEM[itemId] = newI;
+          Game.DATASTORE.ITEM[itemId].fromJSON(state_data.ITEM[itemId]);
+        }
+      }
+
       // game play et al
       Game.UIMode.gamePlay.attr = state_data.GAME_PLAY;
       Game.Message.attr = state_data.MESSAGES;
       this._storedKeyBinding = state_data.KEY_BINDING_SET; // NOTE: not setting the key binding directly because it's set to _storedKeyBinding when this ui mode is exited
 
       // schedule
+      // NOTE: we need to initialize the timing engine a second time because as entities were restored above any active ones scheduled themselves automatically based on their base duration
       Game.initializeTimingEngine();
       for (var schedItemId in state_data.SCHEDULE) {
         if (state_data.SCHEDULE.hasOwnProperty(schedItemId)) {
@@ -161,14 +168,18 @@ Game.UIMode.gamePersistence = {
     }
   },
   newGame: function () {
-    Game.DATASTORE = {};
-    Game.DATASTORE.MAP = {};
-    Game.DATASTORE.ENTITY = {};
-    Game.initializeTimingEngine();
+    this._resetGameDataStructures();
     Game.setRandomSeed(5 + Math.floor(Game.TRANSIENT_RNG.getUniform()*100000));
     Game.UIMode.gamePlay.setupNewGame();
     Game.Message.send('new game started');
     Game.switchUiMode('gamePlay');
+  },
+  _resetGameDataStructures: function () {
+    Game.DATASTORE = {};
+    Game.DATASTORE.MAP = {};
+    Game.DATASTORE.ENTITY = {};
+    Game.DATASTORE.ITEM = {};
+    Game.initializeTimingEngine();
   },
   localStorageAvailable: function () { // NOTE: see https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
   	try {
@@ -372,6 +383,7 @@ Game.UIMode.gamePlay = {
     this.setCameraToAvatar();
 
     // dev code - just add some entities to the map
+    var test = Game.ItemGenerator.create('rock');
     for (var ecount = 0; ecount < 4; ecount++) {
       this.getMap().addEntity(Game.EntityGenerator.create('moss'),this.getMap().getRandomWalkableLocation());
       this.getMap().addEntity(Game.EntityGenerator.create('newt'),this.getMap().getRandomWalkableLocation());

@@ -51,6 +51,10 @@ Game.SymbolActive = function(template) {
 };
 Game.SymbolActive.extend(Game.Symbol);
 
+Game.SymbolActive.prototype.getId = function() {
+    return this.attr._id;
+};
+
 Game.SymbolActive.prototype.getName = function() {
     return this.attr._name;
 };
