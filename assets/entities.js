@@ -8,7 +8,7 @@ Game.EntityGenerator.learn({
   maxHp: 10,
   attackAvoid: 1,
   attackDamage: 2,
-  mixins: ["PlayerActor", "PlayerMessager", "WalkerCorporeal", "Sight", "MapMemory", "HitPoints", "Chronicle", "MeleeAttacker", "MeleeDefender"]
+  mixins: ["PlayerActor", "PlayerMessager", "WalkerCorporeal", "Sight", "MapMemory", "HitPoints", "Chronicle", "MeleeAttacker", "MeleeDefender","InventoryHolder"]
 });
 
 Game.EntityGenerator.learn({
