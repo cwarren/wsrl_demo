@@ -29,7 +29,7 @@ Game.EntityGenerator.learn({
 
 Game.EntityGenerator.learn({
   name: 'angry squirrel',
-  chr:'&',
+  chr:String.fromCharCode(163),
   fg:'#aaa',
   maxHp: 2,
   attackPower: 1,

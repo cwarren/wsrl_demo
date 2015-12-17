@@ -379,17 +379,24 @@ Game.UIMode.gamePlay = {
     this.setMap(new Game.Map('caves1'));
     this.setAvatar(Game.EntityGenerator.create('avatar'));
 
-    this.getMap().addEntity(this.getAvatar(),this.getMap().getRandomWalkableLocation());
+    this.getMap().addEntity(this.getAvatar(),this.getMap().getRandomWalkablePosition());
     this.setCameraToAvatar();
 
+    ////////////////////////////////////////////////////
     // dev code - just add some entities to the map
-    var test = Game.ItemGenerator.create('rock');
+    var itemPos = '';
     for (var ecount = 0; ecount < 4; ecount++) {
-      this.getMap().addEntity(Game.EntityGenerator.create('moss'),this.getMap().getRandomWalkableLocation());
-      this.getMap().addEntity(Game.EntityGenerator.create('newt'),this.getMap().getRandomWalkableLocation());
-      this.getMap().addEntity(Game.EntityGenerator.create('angry squirrel'),this.getMap().getRandomWalkableLocation());
-      this.getMap().addEntity(Game.EntityGenerator.create('attack slug'),this.getMap().getRandomWalkableLocation());
+      this.getMap().addEntity(Game.EntityGenerator.create('moss'),this.getMap().getRandomWalkablePosition());
+      this.getMap().addEntity(Game.EntityGenerator.create('newt'),this.getMap().getRandomWalkablePosition());
+      this.getMap().addEntity(Game.EntityGenerator.create('angry squirrel'),this.getMap().getRandomWalkablePosition());
+      this.getMap().addEntity(Game.EntityGenerator.create('attack slug'),this.getMap().getRandomWalkablePosition());
+
+      itemPos = this.getMap().getRandomWalkablePosition();
+      this.getMap().addItem(Game.ItemGenerator.create('rock'),itemPos);
     }
+    this.getMap().addItem(Game.ItemGenerator.create('rock'),itemPos);
+    // end dev code
+    ////////////////////////////////////////////////////
 
     Game.Message.send("Kill 3 or more attack slugs to win!");
   },
