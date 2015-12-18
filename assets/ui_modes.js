@@ -99,6 +99,7 @@ Game.UIMode.gamePersistence = {
       Game.DATASTORE.SCHEDULE_TIME = Game.Scheduler._queue.getTime() - 1; // offset by 1 so that when the engine is started after restore the queue state will match that as when it was saved
 
       window.localStorage.setItem(Game._PERSISTANCE_NAMESPACE, JSON.stringify(Game.DATASTORE));
+      // Game.util.cdebug(Game.DATASTORE);
       Game.Message.send('game saved');
       Game.switchUiMode('gamePlay');
     }
@@ -107,6 +108,7 @@ Game.UIMode.gamePersistence = {
     if (this.localStorageAvailable()) {
       var json_state_data = window.localStorage.getItem(Game._PERSISTANCE_NAMESPACE);
       var state_data = JSON.parse(json_state_data);
+      // Game.util.cdebug(state_data);
 
       this._resetGameDataStructures();
 
@@ -362,7 +364,6 @@ Game.UIMode.gamePlay = {
       var pickupRes = this.getAvatar().pickupItems(Game.util.objectArrayToIdArray(this.getAvatar().getMap().getItems(this.getAvatar().getPos())));
       return pickupRes.numItemsPickedUp > 0;
     } else if (actionBinding.actionKey == 'DROP') {
-      console.log('drop action');
       var dropRes = this.getAvatar().dropItems(this.getAvatar().getItemIds());
       return dropRes.numItemsDropped > 0;
     }
