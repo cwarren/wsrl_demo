@@ -358,6 +358,14 @@ Game.UIMode.gamePlay = {
       tookTurn = this.moveAvatar(1  , 1);
     }
 
+    else if (actionBinding.actionKey == 'PICKUP') {
+      console.log('pickup action');
+      return true;
+    } else if (actionBinding.actionKey == 'DROP') {
+      console.log('drop action');
+      return true;
+    }
+
     else if (actionBinding.actionKey   == 'CHANGE_BINDINGS') {
       Game.KeyBinding.swapToNextKeyBinding();
     } else if (actionBinding.actionKey == 'PERSISTENCE') {
