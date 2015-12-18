@@ -64,6 +64,12 @@ Game.util = {
     }
   },
 
+  objectArrayToIdArray: function (ar) {
+    return ar.map(function (elt) {
+      return elt.getId();
+    });
+  },
+
   compactBooleanArray_or: function (ar) {
     if (! ar) { return false; }
     var ret = false;

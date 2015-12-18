@@ -61,13 +61,17 @@ Game.EntityMixin.PlayerMessager = {
         Game.renderDisplayMessage();
       },
       'allItemsPickedUp': function(evtData) {
-        if (evtData.numItemsPickedUp + 1) {
-          Game.Message.send('you picked up all the items');
+        if (evtData.numItemsPickedUp > 1) {
+          Game.Message.send('you picked up all '+evtData.numItemsPickedUp+' items');
         } else {
           Game.Message.send('you picked up the item');
         }
         Game.renderDisplayMessage();
-      }
+      },
+      'itemsDropped': function(evtData) {
+        Game.Message.send('you dropped '+evtData.numItemsDropped+' item'+(evtData.numItemsDropped > 1 ? 's' : ''));
+        Game.renderDisplayMessage();
+      },
     }
   }
 //    Game.Message.send(msg);
@@ -483,8 +487,8 @@ Game.EntityMixin.InventoryHolder = {
       this.attr._InventoryHolder_attr.itemId = '';
     },
     listeners: {
-      'addItems': function(evtData) {
-        return {addedAnyItems: this.addItems(evtData.itemSet)};
+      'pickupItems': function(evtData) {
+        return {addedAnyItems: this.pickupItems(evtData.itemSet)};
       },
       'dropItems': function(evtData) {
         return {droppedItems: this.dropItems(evtData.itemSet)};
@@ -556,14 +560,18 @@ Game.EntityMixin.InventoryHolder = {
     for (var j = 0; j < addResult.numItemsPickedUp; j++) {
       this.getMap().extractItemAt(itemsToAdd[j],this.getPos());
     }
+    return addResult;
   },
   dropItems: function (ids_or_idxs) {
     var itemIdsToDrop = this.extractItems(ids_or_idxs);
+    var numDropped = 0;
     for (var i = 0; i < itemIdsToDrop.length; i++) {
       if (itemIdsToDrop[i]) {
         this.getMap().addItem(Game.DATASTORE.ITEM[itemIdsToDrop[i]],this.getPos());
+        numDropped++;
       }
     }
+    this.raiseSymbolActiveEvent('itemsDropped',{numItemsDropped:numDropped});
   }
 };
 

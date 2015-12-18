@@ -359,11 +359,12 @@ Game.UIMode.gamePlay = {
     }
 
     else if (actionBinding.actionKey == 'PICKUP') {
-      console.log('pickup action');
-      return true;
+      var pickupRes = this.getAvatar().pickupItems(Game.util.objectArrayToIdArray(this.getAvatar().getMap().getItems(this.getAvatar().getPos())));
+      return pickupRes.numItemsPickedUp > 0;
     } else if (actionBinding.actionKey == 'DROP') {
       console.log('drop action');
-      return true;
+      var dropRes = this.getAvatar().dropItems(this.getAvatar().getItemIds());
+      return dropRes.numItemsDropped > 0;
     }
 
     else if (actionBinding.actionKey   == 'CHANGE_BINDINGS') {
@@ -395,9 +396,9 @@ Game.UIMode.gamePlay = {
     var itemPos = '';
     for (var ecount = 0; ecount < 4; ecount++) {
       this.getMap().addEntity(Game.EntityGenerator.create('moss'),this.getMap().getRandomWalkablePosition());
-      this.getMap().addEntity(Game.EntityGenerator.create('newt'),this.getMap().getRandomWalkablePosition());
-      this.getMap().addEntity(Game.EntityGenerator.create('angry squirrel'),this.getMap().getRandomWalkablePosition());
-      this.getMap().addEntity(Game.EntityGenerator.create('attack slug'),this.getMap().getRandomWalkablePosition());
+      // this.getMap().addEntity(Game.EntityGenerator.create('newt'),this.getMap().getRandomWalkablePosition());
+      // this.getMap().addEntity(Game.EntityGenerator.create('angry squirrel'),this.getMap().getRandomWalkablePosition());
+      // this.getMap().addEntity(Game.EntityGenerator.create('attack slug'),this.getMap().getRandomWalkablePosition());
 
       itemPos = this.getMap().getRandomWalkablePosition();
       this.getMap().addItem(Game.ItemGenerator.create('rock'),itemPos);
