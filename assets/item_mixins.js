@@ -6,15 +6,24 @@ Game.ItemMixin.Container = {
     mixinGroup: 'Container',
     stateNamespace: '_Container_attr',
     stateModel:  {
-      itemId: ''
+      itemIds: [],
+      capacity: 1
     },
     init: function (template) {
-      this.attr._Container_attr.itemId = template.itemId || '';
+      this.attr._Container_attr.itemIds   = template.itemIds || [];
+      this.attr._Container_attr.capacity = template.capacity || 1;
     }
   },
+  getCapacity: function () {
+    return this.attr._Container_attr.capacity ;
+  },
+  setCapacity: function (c) {
+    this.attr._Container_attr.capacity = c;
+  },
   hasSpace: function () {
+    return this.attr._Container_attr.capacity > this.attr._Container_attr.itemIds.length;
     // NOTE: early dev stuff here! simple placeholder functionality....
-    return this.attr._Container_attr.itemId === '';
+    // return this.attr._Container_attr.itemId === '';
   },
   addItems: function (items_or_ids) {
     var addItemStatus = {
@@ -45,19 +54,29 @@ Game.ItemMixin.Container = {
     return addItemStatus;
   },
   _forceAddItemId: function (itemId) {
-    // NOTE: early dev stuff here! simple placeholder functionality....
-    this.attr._Container_attr.itemId = itemId;
+    this.attr._Container_attr.itemIds.push(itemId);
   },
   getItemIds: function () {
-    if (this.attr._Container_attr.itemId) {
-      return [this.attr._Container_attr.itemId];
-    }
-    return [];
+    return this.attr._Container_attr.itemIds;
   },
   extractItems: function (ids_or_idxs) {
-    // NOTE: early dev stuff here! simple placeholder functionality....
-    var ret = [this.attr._Container_attr.itemId];
-    this.attr._Container_attr.itemId = '';
+    var idsOnly = JSON.parse(JSON.stringify(ids_or_idxs)); // clone so we're not accidentally mucking with the param array with is passed by reference
+    // first convert indexes to ids - uniformity makes the rest of this easier
+    // doing this in two passes so itemIds doesn't change mid-loop
+    for (var i = 0; i < idsOnly.length; i++) {
+      if (! isNaN(idsOnly[i])) {
+        idsOnly[i] = this.attr._Container_attr.itemIds[idsOnly[i]];
+      }
+    }
+    var ret = [];
+    while (idsOnly.length > 0) {
+      var curId = idsOnly.shift();
+      var idIdx = this.attr._Container_attr.itemIds.indexOf(curId);
+      if (idIdx > -1) {
+        this.attr._Container_attr.itemIds.splice(idIdx,1);
+        ret.push(Game.DATASTORE.ITEM[curId]);
+      }
+    }
     return ret;
   }
 };

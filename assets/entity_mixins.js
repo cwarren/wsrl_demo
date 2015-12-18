@@ -52,6 +52,10 @@ Game.EntityMixin.PlayerMessager = {
         Game.Message.send('your inventory is full');
         Game.renderDisplayMessage();
       },
+      'inventoryEmpty': function(evtData) {
+        Game.Message.send('you are not carrying anything');
+        Game.renderDisplayMessage();
+      },
       'noItemsPickedUp': function(evtData) {
         Game.Message.send('you could not pick up any items');
         Game.renderDisplayMessage();
@@ -481,13 +485,16 @@ Game.EntityMixin.InventoryHolder = {
     mixinGroup: 'InventoryHolder',
     stateNamespace: '_InventoryHolder_attr',
     stateModel:  {
-      containerId: ''
+      containerId: '',
+      inventoryCapacity: 5
     },
     init: function (template) {
+      this.attr._InventoryHolder_attr.inventoryCapacity = template.inventoryCapacity || 5;
       if (template.containerId) {
         this.attr._InventoryHolder_attr.containerId = template.containerId;
       } else {
         var container = Game.ItemGenerator.create('_inventoryContainer');
+        container.setCapacity(this.attr._InventoryHolder_attr.inventoryCapacity);
         this.attr._InventoryHolder_attr.containerId = container.getId();
       }
     },
@@ -554,15 +561,18 @@ Game.EntityMixin.InventoryHolder = {
     return pickupResult;
   },
   dropItems: function (ids_or_idxs) {
-    var itemIdsToDrop = this._getContainer().extractItems(ids_or_idxs);
-    var numDropped = 0;
-    for (var i = 0; i < itemIdsToDrop.length; i++) {
-      if (itemIdsToDrop[i]) {
-        this.getMap().addItem(Game.DATASTORE.ITEM[itemIdsToDrop[i]],this.getPos());
-        numDropped++;
+    var itemsToDrop = this._getContainer().extractItems(ids_or_idxs);
+    var dropResult = {numItemsDropped:0};
+    if (itemsToDrop.length < 1) {
+      this.raiseSymbolActiveEvent('inventoryEmpty');
+      return dropResult;
+    }
+    for (var i = 0; i < itemsToDrop.length; i++) {
+      if (itemsToDrop[i]) {
+        this.getMap().addItem(itemsToDrop[i],this.getPos());
+        dropResult.numItemsDropped++;
       }
     }
-    var dropResult = {numItemsDropped:numDropped};
     this.raiseSymbolActiveEvent('itemsDropped',dropResult);
     return dropResult;
   }

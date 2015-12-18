@@ -38,6 +38,7 @@ Inventory will cover:
 
 
 More new commands!-  inventory holder entity mixin, pick up an item(g), drop an item (D) (for this step 'inventory' will hold a single thing)
+DONE
 + inventory holder mixin:
   * supports pickupItems event and dropItems event (note the plural - inherently work with sets of items, though the set may contain a single element)
     # appropriate removes from or adds to the map
@@ -48,18 +49,23 @@ More new commands!-  inventory holder entity mixin, pick up an item(g), drop an 
   * handle in gamePlay
 
 Container item mixin
+DONE
 + get by id's or idx's (sets)
   * get all
 + add items (objects or ids)
 + extract items id's or idx's
   * extract all
-+ transfer items to another container id's or idx's
-  * transfer all
+NO for now + transfer items to another container id's or idx's
+NO for now  * transfer all
 
 update inventory holder mixin to use a container
+DONE
 + hidden container item
 + pass along appropriate calls to the item
 + make pickup add things to the container
+
+update container mixin to handle multiple items
+DONE
 
 new ui mode layer - inventory management
 + review textReader and create basic new layer
