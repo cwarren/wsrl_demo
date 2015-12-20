@@ -68,10 +68,13 @@ update container mixin to handle multiple items
 DONE
 
 new ui mode layer - inventory management
+DONE
 
 + review textReader to remember how ui mode layers work
+DONE
 
 + spec out a general item list layer model which can be instantiated to cover the many item listing ui needs
+DONE
   * set list of item (item ids?)
   * spec selection style (none, single, multi)
   * render (need to use a real window model instead of the simple render-start approach of textReader - need to be able to support the selection keys / actions)
@@ -79,8 +82,19 @@ new ui mode layer - inventory management
   * process selected items
   * exit layer (on cancel, and after processing)
 
-+ add to KeyBinding
-+ handle in gamePlay
-+ support a given list of items
-+ allow selection of 1 or more items, and removing selection
-+ allow other code to access set of selected items
+DONE + add to KeyBinding
+DONE + handle in gamePlay
+DONE + support a given list of items
+DONE + allow selection of 1 or more items, and removing selection
+DONE + allow other code to access set of selected items
+
+add itemList basic command to select none should do processing as well
+
+add itemList basic command to select all and process them
+  _hasAllItemsOption - select all is '+'
+
+new ui layer for inventory drop - invoked by drop command
+  - multi select OK
+
+new ui layer for inventory pickup - invoked by pickup command when picking up more than one item
+  - multi select OK
