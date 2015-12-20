@@ -101,6 +101,12 @@ var Game = {
     }
     return null;
   },
+  getDisplayHeight: function (displayId) {
+    if (this._display.hasOwnProperty(displayId)) {
+      return this._display[displayId].h;
+    }
+    return null;
+  },
 
   refresh: function () {
     this.renderDisplayAll();
@@ -115,7 +121,7 @@ var Game = {
     if (this.getCurUiMode() === null) {
       return;
     }
-    if (this.getCurUiMode().hasOwnProperty('renderAvatarInfo')) {
+    if ('renderAvatarInfo' in this.getCurUiMode()) {
       this.getCurUiMode().renderAvatarInfo(this._display.avatar.o);
     }
   },
@@ -124,7 +130,7 @@ var Game = {
     if (this.getCurUiMode() === null) {
       return;
     }
-    if (this.getCurUiMode().hasOwnProperty('render')) {
+    if ('render' in this.getCurUiMode()) {
       this.getCurUiMode().render(this._display.main.o);
     }
   },

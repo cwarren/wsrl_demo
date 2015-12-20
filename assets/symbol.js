@@ -18,6 +18,14 @@ Game.Symbol.prototype.getBg = function () {
   return this.attr._bg;
 };
 
+Game.Symbol.prototype.getColorDesignator = function(){
+    return '%c{'+this.attr._fg+'}%b{'+this.attr._bg+'}';
+};
+
+Game.Symbol.prototype.getRepresentation = function() {
+    return '%c{' + this.attr._fg + '}%b{' + this.attr._bg + '}' + this.attr._char;
+};
+
 Game.Symbol.prototype.draw = function (display,disp_x,disp_y,isMasked) {
   if (isMasked) {
     display.draw(disp_x,disp_y,this.attr._char,'#444','#000');

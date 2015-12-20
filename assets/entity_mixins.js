@@ -510,16 +510,16 @@ Game.EntityMixin.InventoryHolder = {
   _getContainer: function () {
     return Game.DATASTORE.ITEM[this.attr._InventoryHolder_attr.containerId];
   },
-  hasSpace: function () {
+  hasInventorySpace: function () {
     return this._getContainer().hasSpace();
   },
-  addItems: function (items_or_ids) {
+  addInventoryItems: function (items_or_ids) {
     return this._getContainer().addItems(items_or_ids);
   },
-  getItemIds: function () {
+  getInventoryItemIds: function () {
     return this._getContainer().getItemIds();
   },
-  extractItems: function (ids_or_idxs) {
+  extractInventoryItems: function (ids_or_idxs) {
     return this._getContainer().extractItems(ids_or_idxs);
   },
   pickupItems: function (ids_or_idxs) {

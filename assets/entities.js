@@ -8,7 +8,7 @@ Game.EntityGenerator.learn({
   maxHp: 10,
   attackAvoid: 1,
   attackDamage: 2,
-  inventoryCapacity: 3,
+  inventoryCapacity: 35,
   mixins: ["PlayerActor", "PlayerMessager", "WalkerCorporeal", "Sight", "MapMemory", "HitPoints", "Chronicle", "MeleeAttacker", "MeleeDefender","InventoryHolder"]
 });
 
