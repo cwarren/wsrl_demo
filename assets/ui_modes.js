@@ -523,6 +523,7 @@ Game.UIMode.LAYER_itemListing = function(template) {
   this._displayItemsStartIndex = 0;
   this._displayItems = [];
   this._displayMaxNum = Game.getDisplayHeight('main')-3;
+  this._numItemsShown = 0;
 };
 
 Game.UIMode.LAYER_itemListing.prototype._runFilterOnItemIdList = function () {
@@ -541,7 +542,6 @@ Game.UIMode.LAYER_itemListing.prototype.enter = function () {
     this.doSetup();
   }
   Game.refresh();
-  //Game.specialMessage("[Esc] to exit, [ and ] for scrolling");
 };
 Game.UIMode.LAYER_itemListing.prototype.exit = function () {
   Game.KeyBinding.setKeyBinding(this._storedKeyBinding);
@@ -583,6 +583,7 @@ Game.UIMode.LAYER_itemListing.prototype.setup = function(setupParams) {
   this._displayItemsStartIndex = 0;
   this._displayItems = [];
   this.determineDisplayItems();
+  this._numItemsShown = 0;
 };
 
 Game.UIMode.LAYER_itemListing.prototype.getItemList = function () {
@@ -632,10 +633,10 @@ Game.UIMode.LAYER_itemListing.prototype.getCaptionText = function () {
 Game.UIMode.LAYER_itemListing.prototype.render = function (display) {
   var selectionLetters = 'abcdefghijklmnopqrstuvwxyz';
 
-  // Render the caption in the top row
   display.drawText(0, 0, Game.UIMode.DEFAULT_COLOR_STR + this.getCaptionText());
 
   var row = 0;
+
   if (this._hasNoItemOption) {
     display.drawText(0, 1, Game.UIMode.DEFAULT_COLOR_STR + '0 - no item');
     row++;
@@ -644,6 +645,7 @@ Game.UIMode.LAYER_itemListing.prototype.render = function (display) {
     display.drawText(0, 1 + row, '%c{black}%b{yellow}[ for more');
     row++;
   }
+  this._numItemsShown = 0;
   for (var i = 0; i < this._displayItems.length; i++) {
     var trueItemIndex = this._displayItemsStartIndex + i;
     if (this._displayItems[i]) {
@@ -655,6 +657,7 @@ Game.UIMode.LAYER_itemListing.prototype.render = function (display) {
       var item_symbol = this._displayItems[i].getRepresentation()+Game.UIMode.DEFAULT_COLOR_STR;
       display.drawText(0, 1 + row, Game.UIMode.DEFAULT_COLOR_STR + selectionLetter + ' ' + selectionState + ' ' + item_symbol + ' ' +this._displayItems[i].getName());
       row++;
+      this._numItemsShown++;
     }
   }
   if ((this._displayItemsStartIndex + this._displayItems.length) < this._itemIdList.length) {
@@ -682,47 +685,18 @@ Game.UIMode.LAYER_itemListing.prototype.executeProcessingFunction = function() {
   }
 };
 
-Game.UIMode.LAYER_itemListing.prototype.getNumItemsShown = function () {
-  var numItemsShown = this._displayMaxNum;
-
-  if (this._hasNoItemOption) {
-    numItemsShown--;
-  }
-  if ((this._displayItemsStartIndex + this._displayItems.length) < this._itemIdList.length) {
-    numItemsShown--;
-  }
-  if (this._displayItemsStartIndex > 0) {
-    numItemsShown--;
-  }
-
-  return numItemsShown;
-};
-
 Game.UIMode.LAYER_itemListing.prototype.handleInput = function (inputType,inputData) {
-  // console.log(inputType);
-  // console.dir(inputData);
   var actionBinding = Game.KeyBinding.getInputBinding(inputType,inputData);
-  // console.log('action binding is');
-  // console.dir(actionBinding);
-  // console.log('----------');
   if (! actionBinding) {
-    // console.log('no bound action - checking for selection stuff');
     if ((inputType === 'keydown') && this._canSelectItem && inputData.keyCode >= ROT.VK_A && inputData.keyCode <= ROT.VK_Z) {
-      // handle pressing a selection letter
-      // console.log('handling selection '+inputData.keyCode);
-
-      // Check if it maps to a valid item by subtracting 'a' from the character
-      // to know what letter of the alphabet we used.
+      // Check if it maps to a valid item by subtracting 'a' from the character to know what letter of the alphabet we used.
       var index = inputData.keyCode - ROT.VK_A;
-      if (index > this.getNumItemsShown()) {
+      if (index >= this._numItemsShown) {
         return false;
       }
       var trueItemIndex = this._displayItemsStartIndex + index;
-      // console.log('index: '+index);
-      // console.log('trueItemIndex: '+trueItemIndex);
-      // console.log('this._itemIdList[trueItemIndex]: '+this._itemIdList[trueItemIndex]);
       if (this._itemIdList[trueItemIndex]) {
-        // If multiple selection is allowed, toggle the selection status, else select the item and exit the screen
+        // If multiple selection is allowed, toggle the selection status, else select the item and process it
         if (this._canSelectMultipleItems) {
             if (this._selectedItemIdxs[trueItemIndex]) {
               delete this._selectedItemIdxs[trueItemIndex];
@@ -741,15 +715,12 @@ Game.UIMode.LAYER_itemListing.prototype.handleInput = function (inputType,inputD
   }
 
   if (actionBinding.actionKey == 'CANCEL') {
-    console.log('CANCEL ');
     Game.removeUiMode();
 
   } else if (actionBinding.actionKey == 'PROCESS_SELECTIONS') {
-    console.log('PROCESS_SELECTIONS ');
     this.executeProcessingFunction();
 
   } else if (this._canSelectItem && this._hasNoItemOption && (actionBinding.actionKey == 'SELECT_NOTHING')) {
-    console.log('SELECT_NOTHING ');
     this._selectedItemIdxs = {};
 
   } else if (actionBinding.actionKey == 'DATA_NAV_UP') {
@@ -761,7 +732,7 @@ Game.UIMode.LAYER_itemListing.prototype.handleInput = function (inputType,inputD
   } else if (actionBinding.actionKey == 'HELP') {
     var helpText = this.getCaptionText()+"\n";
     if (this._canSelectItem || this._canSelectMultipleItems) {
-      var lastSelectionLetter = (String.fromCharCode(ROT.VK_A + this.getNumItemsShown())).toLowerCase();
+      var lastSelectionLetter = (String.fromCharCode(ROT.VK_A + this._numItemsShown-1)).toLowerCase();
       helpText += "a-"+lastSelectionLetter+"   select the indicated item\n";
     }
     helpText += Game.KeyBinding.getBindingHelpText();
@@ -791,6 +762,9 @@ Game.UIMode.LAYER_inventoryDrop = new Game.UIMode.LAYER_itemListing({
     canSelectMultipleItems: true,
     keyBindingName: 'LAYER_inventoryDrop',
     processingFunction: function (selectedItemIds) {
+      if (selectedItemIds.length < 1) {
+        return false;
+      }
       var dropResult = Game.getAvatar().dropItems(selectedItemIds);
       return dropResult.numItemsDropped > 0;
     }
