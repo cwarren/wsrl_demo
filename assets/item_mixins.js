@@ -1,5 +1,30 @@
 Game.ItemMixin = {};
 
+Game.ItemMixin.Food = {
+  META: {
+    mixinName: 'Food',
+    mixinGroup: 'Food',
+    stateNamespace: '_Food_attr',
+    stateModel:  {
+      foodValue: 500
+    },
+    init: function (template) {
+      this.attr._Food_attr.foodValue = template.foodValue || 500;
+    },
+    listeners: {
+      'getStatsForDisplay': function(evtData) {
+        return {'food value':this.getFoodValue()};
+      }
+    }
+  },
+  getFoodValue: function () {
+    return this.attr._Food_attr.foodValue;
+  },
+  setFoodValue: function (v) {
+    this.attr._Food_attr.foodValue = v;
+  }
+};
+
 Game.ItemMixin.Container = {
   META: {
     mixinName: 'Container',

@@ -424,6 +424,9 @@ Game.UIMode.gamePlay = {
 
       itemPos = this.getMap().getRandomWalkablePosition();
       this.getMap().addItem(Game.ItemGenerator.create('rock'),itemPos);
+
+      itemPos = this.getMap().getRandomWalkablePosition();
+      this.getMap().addItem(Game.ItemGenerator.create('apple'),itemPos);
     }
     this.getMap().addItem(Game.ItemGenerator.create('rock'),itemPos);
 

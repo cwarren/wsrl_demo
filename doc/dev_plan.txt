@@ -13,6 +13,7 @@ Base game:
 - avatar info display (more than just map coords)
 - item and entity descriptions; calculating item and entity stats for player viewing
 - hunger, food, and eating
+
 - looking at things (targeting)
 - equipment
 - improved map generation - random seeds for maps? seeding items? connected maps?
@@ -30,6 +31,15 @@ Later:
 - improved combat mechanics
 - ipad compatibility (capturing input, figuring out key bindings)
 
-Fancier avatar info is very simple - just adding a bit more to the renderAvatarInfo method of the gamePlay UIMode.
+DONE Fancier avatar info is very simple - just adding a bit more to the renderAvatarInfo method of the gamePlay UIMode.
 
-Item and entity info will use the same general mechanism of adding a getStats listener to each mixin and then compiling the results. It'll need some general info as well (e.g. the name), so I'll add a getDescription method to SymbolActive. This won't actually display anything but will return a string that can be used as needed.
+DONE Item and entity info will use the same general mechanism of adding a getStats listener to each mixin and then compiling the results. It'll need some general info as well (e.g. the name), so I'll add a getDescription method to SymbolActive. This won't actually display anything but will return a string that can be used as needed.
+
+DONE To have item examination give something besides the fixed description the examined item will need some more stats. I'll want an item mixin for which it makes sense to have a getStats listener. Basic food items are pretty straightforward, so I'll go ahead and implement some food, and might as well do hunger and eating while I'm at it.
+
+hunger - a counter which is decremented each time the avatar completes a turn (possibly depending on the duration of the turn)
+starvation - if the hunger counter gets too low the avatar dies
+status message - add hunger status to avatar info, and send messages to the player when hunger status changes
+eating - consumes/destroys an edible item to increase the hunger counter by some amount
+DONE edible - has a food value, getStats says what the food value is
+eat screen - select a single item from a list filtered by hasMixin('Edible') and eat it (NOTE: will have to handle the situation where the filter function leaves nothing to select)

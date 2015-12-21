@@ -8,3 +8,12 @@ Game.ItemGenerator.learn({
   chr:String.fromCharCode(174),
   fg:'#bbc'
 });
+
+Game.ItemGenerator.learn({
+  name: 'apple',
+  description: 'a nice juicy apple - yum!',
+  chr:String.fromCharCode(174),
+  fg:'#f32',
+  foodValue: 100,
+  mixins: ['Food']
+});
