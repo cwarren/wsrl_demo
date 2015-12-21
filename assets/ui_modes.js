@@ -766,6 +766,18 @@ Game.UIMode.LAYER_inventoryListing.doSetup = function () {
   this.setup({itemIdList: Game.getAvatar().getInventoryItemIds()});
 };
 
+Game.UIMode.LAYER_inventoryListing.handleInput = function (inputType,inputData) {
+  var actionBinding = Game.KeyBinding.getInputBinding(inputType,inputData);
+
+  if (actionBinding) {
+    if (actionBinding.actionKey == 'EXAMINE') {
+      Game.addUiMode('LAYER_inventoryExamine');
+      return false;
+    }
+  }
+  return Game.UIMode.LAYER_itemListing.prototype.handleInput.call(this,inputType,inputData);
+};
+
 //-------------------
 
 Game.UIMode.LAYER_inventoryDrop = new Game.UIMode.LAYER_itemListing({
@@ -808,11 +820,10 @@ Game.UIMode.LAYER_inventoryExamine = new Game.UIMode.LAYER_itemListing({
     canSelect: true,
     keyBindingName: 'LAYER_inventoryExamine',
     processingFunction: function (selectedItemIds) {
-      console.log('LAYER_inventoryExamine processing on '+selectedItemIds[0]);
+      //console.log('LAYER_inventoryExamine processing on '+selectedItemIds[0]);
       if (selectedItemIds[0]) {
         var d = Game.DATASTORE.ITEM[selectedItemIds[0]].getDetailedDescription();
-        console.log('sending special message of '+d);
-        setTimeout(function() {
+        setTimeout(function() { // delay here because of the general refresh on exiting the layer
            Game.specialMessage(d);
         }, 2);
       }
