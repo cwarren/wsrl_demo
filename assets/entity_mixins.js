@@ -65,15 +65,21 @@ Game.EntityMixin.PlayerMessager = {
         Game.renderDisplayMessage();
       },
       'allItemsPickedUp': function(evtData) {
-        if (evtData.numItemsPickedUp > 1) {
+        if (evtData.numItemsPickedUp > 2) {
           Game.Message.send('you picked up all '+evtData.numItemsPickedUp+' items');
+        } else if (evtData.numItemsPickedUp == 2) {
+            Game.Message.send('you picked up both items');
         } else {
-          Game.Message.send('you picked up the item');
+          Game.Message.send('you picked up the '+evtData.lastItemPickedUpName);
         }
         Game.renderDisplayMessage();
       },
       'itemsDropped': function(evtData) {
-        Game.Message.send('you dropped '+evtData.numItemsDropped+' item'+(evtData.numItemsDropped > 1 ? 's' : ''));
+        if (evtData.numItemsDropped > 1) {
+          Game.Message.send('you dropped '+evtData.numItemsDropped+' items');
+        } else {
+          Game.Message.send('you dropped the '+evtData.lastItemDroppedName);
+        }
         Game.renderDisplayMessage();
       },
     }
@@ -548,10 +554,12 @@ Game.EntityMixin.InventoryHolder = {
     var addResult = this._getContainer().addItems(itemsToAdd);
     pickupResult.numItemsPickedUp = addResult.numItemsAdded;
     pickupResult.numItemsNotPickedUp = addResult.numItemsNotAdded;
+    var lastItemFromMap = '';
     for (var j = 0; j < pickupResult.numItemsPickedUp; j++) {
-      this.getMap().extractItemAt(itemsToAdd[j],this.getPos());
+      lastItemFromMap = this.getMap().extractItemAt(itemsToAdd[j],this.getPos());
     }
 
+    pickupResult.lastItemPickedUpName = lastItemFromMap.getName();
     if (pickupResult.numItemsNotPickedUp > 0) {
       this.raiseSymbolActiveEvent('someItemsPickedUp',pickupResult);
     } else {
@@ -567,12 +575,15 @@ Game.EntityMixin.InventoryHolder = {
       this.raiseSymbolActiveEvent('inventoryEmpty');
       return dropResult;
     }
+    var lastItemDropped = '';
     for (var i = 0; i < itemsToDrop.length; i++) {
       if (itemsToDrop[i]) {
+        lastItemDropped = itemsToDrop[i];
         this.getMap().addItem(itemsToDrop[i],this.getPos());
         dropResult.numItemsDropped++;
       }
     }
+    dropResult.lastItemDroppedName = lastItemDropped.getName();
     this.raiseSymbolActiveEvent('itemsDropped',dropResult);
     return dropResult;
   }
