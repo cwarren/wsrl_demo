@@ -10,7 +10,6 @@ Addendum: Which bites are taken when is key to success.
 
 Some of the tasks that would need to be done for a full game aren't really necessary for a base game, so I'm (at least for now) setting them aside. I'm also far enough along that I'm going to put a bit of thought into ordering the milestone list at this point.
 Base game:
-- inventory
 - avatar info display (more than just map coords)
 - item and entity descriptions; calculating item and entity stats for player viewing
 - hunger, food, and eating
@@ -21,80 +20,16 @@ Base game:
 Later:
 - random tables (ways of selecting at random from a weighted and possibly dynamic set)
 - treasure drops
+- throwing things & ranged combat
 - map modification - digging
 - ongoing actions
 - avatar advancement - experience and improvement
 - game scoring
 - multiple maps and moving between them
 - improved map tiles and generation - more tile types, variable digging
-- throwing things & ranged combat
 - improved combat mechanics
 - ipad compatibility (capturing input, figuring out key bindings)
 
-Inventory will cover:
-- More new commands!-  inventory holder entity mixin, pick up an item(g), drop an item (D) (for this step 'inventory' will hold a single thing)
-- Container item mixin, and using a behind-the-scenes item with that capability for the player's inventory
-- new ui mode layer - inventory management (with new command!- manage inventory (i)), support drop directly from inventory management
+Fancier avatar info is very simple - just adding a bit more to the renderAvatarInfo method of the gamePlay UIMode.
 
-
-More new commands!-  inventory holder entity mixin, pick up an item(g), drop an item (D) (for this step 'inventory' will hold a single thing)
-DONE
-+ inventory holder mixin:
-  * supports pickupItems event and dropItems event (note the plural - inherently work with sets of items, though the set may contain a single element)
-    # appropriate removes from or adds to the map
-  * messages to player on: picked up, dropped, can't pickup (nothing there, inven full), can't drop (inven empty)
-  * initial implementation will have just a single item, but that will turn into a full system by the end of this milestone
-+ commands get and drop
-  * add to KeyBinding
-  * handle in gamePlay
-
-Container item mixin
-DONE
-+ get by id's or idx's (sets)
-  * get all
-+ add items (objects or ids)
-+ extract items id's or idx's
-  * extract all
-NO for now + transfer items to another container id's or idx's
-NO for now  * transfer all
-
-update inventory holder mixin to use a container
-DONE
-+ hidden container item
-+ pass along appropriate calls to the item
-+ make pickup add things to the container
-
-update container mixin to handle multiple items
-DONE
-
-new ui mode layer - inventory management
-DONE
-
-+ review textReader to remember how ui mode layers work
-DONE
-
-+ spec out a general item list layer model which can be instantiated to cover the many item listing ui needs
-DONE
-  * set list of item (item ids?)
-  * spec selection style (none, single, multi)
-  * render (need to use a real window model instead of the simple render-start approach of textReader - need to be able to support the selection keys / actions)
-  * handle input: data nav & actual selection (indiv, all/none)
-  * process selected items
-  * exit layer (on cancel, and after processing)
-
-DONE + add to KeyBinding
-DONE + handle in gamePlay
-DONE + support a given list of items
-DONE + allow selection of 1 or more items, and removing selection
-DONE + allow other code to access set of selected items
-
-add itemList basic command to select none should do processing as well
-
-add itemList basic command to select all and process them
-  _hasAllItemsOption - select all is '+'
-
-new ui layer for inventory drop - invoked by drop command
-  - multi select OK
-
-new ui layer for inventory pickup - invoked by pickup command when picking up more than one item
-  - multi select OK
+Item and entity info will use the same general mechanism of adding a getStats listener to each mixin and then compiling the results. It'll need some general info as well (e.g. the name), so I'll add a getDescription method to SymbolActive. This won't actually display anything but will return a string that can be used as needed.

@@ -304,8 +304,22 @@ Game.UIMode.gamePlay = {
     this.getAvatar().rememberCoords(seenCells);
   },
   renderAvatarInfo: function (display) {
-    display.drawText(1,2,Game.UIMode.DEFAULT_COLOR_STR+"avatar x: "+this.getAvatar().getX()); // DEV
-    display.drawText(1,3,Game.UIMode.DEFAULT_COLOR_STR+"avatar y: "+this.getAvatar().getY()); // DEV
+    // feels like this should be encapsulated somewhere else, but I don't really know where - perhaps in the PlayerActor mixin?
+    var av = this.getAvatar();
+    var y = 0;
+    y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"ATTACK");
+    y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"Accuracy: "+av.getAttackHit());
+    y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"Power: "+av.getAttackDamage());
+    y++;
+    y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"DEFENSE");
+    y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"Dodging: "+av.getAttackAvoid());
+    y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"Toughness: "+av.getDamageMitigation());
+    y++;
+    y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"LIFE: "+av.getCurHp()+"/"+av.getMaxHp());
+    y++;
+    y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"MOVES: "+av.getTurns());
+    y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"KILLS: "+av.getTotalKills());
+
   },
   moveAvatar: function (pdx,pdy) {
     // console.log('moveAvatar '+pdx+','+pdy);
@@ -368,14 +382,12 @@ Game.UIMode.gamePlay = {
         var pickupRes = this.getAvatar().pickupItems(pickUpList);
         tookTurn = pickupRes.numItemsPickedUp > 0;
       } else {
-        // var pickupRes = this.getAvatar().pickupItems(Game.util.objectArrayToIdArray(this.getAvatar().getMap().getItems(this.getAvatar().getPos())));
-        // tookTurn = pickupRes.numItemsPickedUp > 0;
         Game.addUiMode('LAYER_inventoryPickup');
       }
     } else if (actionBinding.actionKey == 'DROP') {
       Game.addUiMode('LAYER_inventoryDrop');
-      //var dropRes = this.getAvatar().dropItems(this.getAvatar().getItemIds());
-      //tookTurn = dropRes.numItemsDropped > 0;
+    } else if (actionBinding.actionKey == 'EXAMINE') {
+      Game.addUiMode('LAYER_inventoryExamine');
     }
 
     else if (actionBinding.actionKey   == 'CHANGE_BINDINGS') {
@@ -407,17 +419,17 @@ Game.UIMode.gamePlay = {
     for (var ecount = 0; ecount < 4; ecount++) {
       this.getMap().addEntity(Game.EntityGenerator.create('moss'),this.getMap().getRandomWalkablePosition());
       this.getMap().addEntity(Game.EntityGenerator.create('newt'),this.getMap().getRandomWalkablePosition());
-      // this.getMap().addEntity(Game.EntityGenerator.create('angry squirrel'),this.getMap().getRandomWalkablePosition());
-      // this.getMap().addEntity(Game.EntityGenerator.create('attack slug'),this.getMap().getRandomWalkablePosition());
+      this.getMap().addEntity(Game.EntityGenerator.create('angry squirrel'),this.getMap().getRandomWalkablePosition());
+      this.getMap().addEntity(Game.EntityGenerator.create('attack slug'),this.getMap().getRandomWalkablePosition());
 
       itemPos = this.getMap().getRandomWalkablePosition();
       this.getMap().addItem(Game.ItemGenerator.create('rock'),itemPos);
     }
     this.getMap().addItem(Game.ItemGenerator.create('rock'),itemPos);
 
-    for (var ti=0; ti<30;ti++) {
-      Game.getAvatar().addInventoryItems([Game.ItemGenerator.create('rock')]);
-    }
+    // for (var ti=0; ti<30;ti++) {
+    //   Game.getAvatar().addInventoryItems([Game.ItemGenerator.create('rock')]);
+    // }
     // end dev code
     ////////////////////////////////////////////////////
 
@@ -787,4 +799,26 @@ Game.UIMode.LAYER_inventoryPickup = new Game.UIMode.LAYER_itemListing({
 });
 Game.UIMode.LAYER_inventoryPickup.doSetup = function () {
   this.setup({itemIdList: Game.util.objectArrayToIdArray(Game.getAvatar().getMap().getItems(Game.getAvatar().getPos()))});
+};
+
+//-------------------
+
+Game.UIMode.LAYER_inventoryExamine = new Game.UIMode.LAYER_itemListing({
+    caption: 'Examine',
+    canSelect: true,
+    keyBindingName: 'LAYER_inventoryExamine',
+    processingFunction: function (selectedItemIds) {
+      console.log('LAYER_inventoryExamine processing on '+selectedItemIds[0]);
+      if (selectedItemIds[0]) {
+        var d = Game.DATASTORE.ITEM[selectedItemIds[0]].getDetailedDescription();
+        console.log('sending special message of '+d);
+        setTimeout(function() {
+           Game.specialMessage(d);
+        }, 2);
+      }
+      return false;
+    }
+});
+Game.UIMode.LAYER_inventoryExamine.doSetup = function () {
+  this.setup({itemIdList: Game.getAvatar().getInventoryItemIds()});
 };

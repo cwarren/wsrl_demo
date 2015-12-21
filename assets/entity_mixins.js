@@ -206,7 +206,8 @@ Game.EntityMixin.Chronicle = {
     stateModel:  {
       turnCounter: 0,
       killLog:{},
-      deathMessage:''
+      deathMessage:'',
+      killCount: 0
     },
     listeners: {
       'actionDone': function(evtData) {
@@ -239,6 +240,9 @@ Game.EntityMixin.Chronicle = {
   getKillsOf: function (entityName) {
     return this.attr._Chronicle_attr.killLog[entityName] || 0;
   },
+  getTotalKills: function () {
+    return this.attr._Chronicle_attr.killCount;
+  },
   clearKills: function () {
     this.attr._Chronicle_attr.killLog = {};
   },
@@ -250,6 +254,7 @@ Game.EntityMixin.Chronicle = {
     } else {
       this.attr._Chronicle_attr.killLog[entName] = 1;
     }
+    this.attr._Chronicle_attr.killCount++;
   }
 };
 
