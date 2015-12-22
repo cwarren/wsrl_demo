@@ -46,6 +46,8 @@ var Game = {
 
   DATASTORE: {},
 
+  DeadAvatar: null,
+
   Scheduler: null,
   TimeEngine: null,
 

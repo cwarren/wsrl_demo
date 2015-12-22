@@ -39,7 +39,11 @@ Game.EntityMixin.PlayerMessager = {
         Game.Message.ageMessages();  // NOTE: maybe not do this? If surrounded by multiple attackers messages could be aged out before being seen...
       },
       'killed': function(evtData) {
-        Game.Message.send('you were killed by the '+evtData.killedBy.getName());
+        if (typeof evtData.killedBy == 'string') {
+          Game.Message.send('you were killed by '+evtData.killedBy);
+        } else {
+          Game.Message.send('you were killed by the '+evtData.killedBy.getName());
+        }
         Game.renderDisplayMessage();
         Game.Message.ageMessages();
       },
@@ -103,8 +107,11 @@ Game.EntityMixin.PlayerActor = {
     listeners: {
       'actionDone': function(evtData) {
         Game.Scheduler.setDuration(this.getCurrentActionDuration());
+        this.raiseSymbolActiveEvent('getHungrier',{duration:this.getCurrentActionDuration()});
         this.setCurrentActionDuration(this.getBaseActionDuration()+Game.util.randomInt(-5,5));
-        setTimeout(function() {Game.TimeEngine.unlock();},1); // NOTE: this tiny delay ensures console output happens in the right order, which in turn means I have confidence in the turn-taking order of the various entities
+        setTimeout(function() {
+          Game.TimeEngine.unlock();
+        },1); // NOTE: this tiny delay ensures console output happens in the right order, which in turn means I have confidence in the turn-taking order of the various entities
         Game.renderDisplayMessage();
         // console.log("end player acting");
       },
@@ -119,6 +126,7 @@ Game.EntityMixin.PlayerActor = {
       },
       'killed': function(evtData) {
         //Game.TimeEngine.lock();
+        Game.DeadAvatar = this;
         Game.switchUiMode("gameLose");
       }
     }
@@ -152,6 +160,66 @@ Game.EntityMixin.PlayerActor = {
     Game.TimeEngine.lock();
     // console.log("player post-lock engine lock state is "+Game.TimeEngine._lock);
     this.isActing(false);
+  }
+};
+
+Game.EntityMixin.FoodConsumer = {
+  META: {
+    mixinName: 'FoodConsumer',
+    mixinGroup: 'FoodConsumer',
+    stateNamespace: '_FoodConsumer_attr',
+    stateModel:  {
+      currentFood: 2000,
+      maxFood: 2000,
+      foodConsumedPer1000Ticks: 1
+    },
+    init: function (template) {
+      this.attr._FoodConsumer_attr.maxFood = template.maxFood || 2000;
+      this.attr._FoodConsumer_attr.currentFood = template.currentFood || (this.attr._FoodConsumer_attr.maxFood*0.9);
+      this.attr._FoodConsumer_attr.foodConsumedPer1000Ticks = template.foodConsumedPer1000Ticks || 1;
+    },
+    listeners: {
+      'getHungrier': function(evtData) {
+        this.getHungrierBy(this.attr._FoodConsumer_attr.foodConsumedPer1000Ticks * evtData.duration/1000);
+      }
+    }
+  },
+  getMaxFood: function () {
+    return this.attr._FoodConsumer_attr.maxFood;
+  },
+  setMaxFood: function (n) {
+    this.attr._FoodConsumer_attr.maxFood = n;
+  },
+  getCurFood: function () {
+    return this.attr._FoodConsumer_attr.currentFood;
+  },
+  setCurFood: function (n) {
+    this.attr._FoodConsumer_attr.currentFood = n;
+  },
+  getFoodConsumedPer1000: function () {
+    return this.attr._FoodConsumer_attr.foodConsumedPer1000Ticks;
+  },
+  setFoodConsumedPer1000: function (n) {
+    this.attr._FoodConsumer_attr.foodConsumedPer1000Ticks = n;
+  },
+  eatFood: function (foodAmt) {
+    this.attr._FoodConsumer_attr.currentFood += foodAmt;
+    if (this.attr._FoodConsumer_attr.currentFood > this.attr._FoodConsumer_attr.maxFood) {this.attr._FoodConsumer_attr.currentFood = this.attr._FoodConsumer_attr.maxFood;}
+  },
+  getHungrierBy: function (foodAmt) {
+    this.attr._FoodConsumer_attr.currentFood -= foodAmt;
+    if (this.attr._FoodConsumer_attr.currentFood < 0) {
+      this.raiseSymbolActiveEvent('killed',{killedBy: 'starvation'});
+    }
+  },
+  getHungerStateDescr: function () {
+    var frac = this.attr._FoodConsumer_attr.currentFood/this.attr._FoodConsumer_attr.maxFood;
+    if (frac < 0.1) { return '%c{#ffc}%b{#f00}*STARVING*'; }
+    if (frac < 0.25) { return '%c{#c00}%b{#770}starving'; }
+    if (frac < 0.45) { return '%c{#c00}%b{#000}hungry'; }
+    if (frac < 0.65) { return '%c{#770}%b{#000}peckish'; }
+    if (frac < 0.95) { return '%c{#090}%b{#000}full'; }
+    return '%c{#090}%b{#550}*stuffed*';
   }
 };
 
@@ -218,7 +286,11 @@ Game.EntityMixin.Chronicle = {
         this.addKill(evtData.entKilled);
       },
       'killed': function(evtData) {
-        this.attr._Chronicle_attr.deathMessage = 'killed by '+evtData.killedBy.getName();
+        if (typeof evtData.killedBy == 'string') {
+          this.attr._Chronicle_attr.deathMessage = 'killed by '+evtData.killedBy;
+        } else {
+          this.attr._Chronicle_attr.deathMessage = 'killed by '+evtData.killedBy.getName();
+        }
       },
       'calcKillsOf': function (evtData) {
         return {killCount:this.getKillsOf(evtData.entityName)};

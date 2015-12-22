@@ -10,7 +10,8 @@ Game.EntityGenerator.learn({
   attackAvoid: 1,
   attackDamage: 2,
   inventoryCapacity: 35,
-  mixins: ["PlayerActor", "PlayerMessager", "WalkerCorporeal", "Sight", "MapMemory", "HitPoints", "Chronicle", "MeleeAttacker", "MeleeDefender","InventoryHolder"]
+  maxFood: 100,
+  mixins: ["PlayerActor", "PlayerMessager", "WalkerCorporeal", "Sight", "MapMemory", "HitPoints", "Chronicle", "MeleeAttacker", "MeleeDefender","InventoryHolder","FoodConsumer"]
 });
 
 Game.EntityGenerator.learn({
