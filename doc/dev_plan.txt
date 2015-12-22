@@ -37,9 +37,9 @@ DONE Item and entity info will use the same general mechanism of adding a getSta
 
 DONE To have item examination give something besides the fixed description the examined item will need some more stats. I'll want an item mixin for which it makes sense to have a getStats listener. Basic food items are pretty straightforward, so I'll go ahead and implement some food, and might as well do hunger and eating while I'm at it.
 
-hunger - a counter which is decremented each time the avatar completes a turn (possibly depending on the duration of the turn)
-starvation - if the hunger counter gets too low the avatar dies
-status message - add hunger status to avatar info, and send messages to the player when hunger status changes
-eating - consumes/destroys an edible item to increase the hunger counter by some amount
+DONE hunger - a counter which is decremented each time the avatar completes a turn (possibly depending on the duration of the turn)
+DONE starvation - if the hunger counter gets too low the avatar dies
+DONE status message - add hunger status to avatar info, and send messages to the player when hunger status changes
+DONE eating - consumes/destroys an edible item to increase the hunger counter by some amount
 DONE edible - has a food value, getStats says what the food value is
-eat screen - select a single item from a list filtered by hasMixin('Edible') and eat it (NOTE: will have to handle the situation where the filter function leaves nothing to select)
+DONE eat screen - select a single item from a list filtered by hasMixin('Edible') and eat it (NOTE: will have to handle the situation where the filter function leaves nothing to select)

@@ -214,12 +214,12 @@ Game.EntityMixin.FoodConsumer = {
   },
   getHungerStateDescr: function () {
     var frac = this.attr._FoodConsumer_attr.currentFood/this.attr._FoodConsumer_attr.maxFood;
-    if (frac < 0.1) { return '%c{#ffc}%b{#f00}*STARVING*'; }
-    if (frac < 0.25) { return '%c{#c00}%b{#770}starving'; }
-    if (frac < 0.45) { return '%c{#c00}%b{#000}hungry'; }
-    if (frac < 0.65) { return '%c{#770}%b{#000}peckish'; }
+    if (frac < 0.1) { return '%c{#ff2}%b{#f00}*STARVING*'; }
+    if (frac < 0.25) { return '%c{#f00}%b{#dd0}starving'; }
+    if (frac < 0.45) { return '%c{#fb0}%b{#540}hungry'; }
+    if (frac < 0.65) { return '%c{#dd0}%b{#000}peckish'; }
     if (frac < 0.95) { return '%c{#090}%b{#000}full'; }
-    return '%c{#090}%b{#550}*stuffed*';
+    return '%c{#090}%b{#320}*stuffed*';
   }
 };
 

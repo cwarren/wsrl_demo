@@ -165,6 +165,13 @@ var Game = {
     }
     return null;
   },
+  getCurUiModeName: function () {
+    var uiModeName = this._uiModeNameStack[0];
+    if (uiModeName) {
+      return uiModeName;
+    }
+    return null;
+  },
   switchUiMode: function (newUiModeName) {
     if (newUiModeName.startsWith('LAYER_')) {
       console.log('cannot switchUiMode to layer '+newUiModeName);
@@ -203,6 +210,20 @@ var Game = {
       curMode.exit();
     }
     this._uiModeNameStack.shift();
+    // curMode = this.getCurUiMode();
+    // if (curMode !== null) {
+    //   curMode.enter();
+    // }
+    // this.renderDisplayAll();
+  },
+  removeUiModeAllLayers: function () {
+    var curModeName = this.getCurUiModeName();
+    while ((curModeName !== null) && curModeName.startsWith('LAYER_')) {
+      var curMode = this.getCurUiMode();
+      curMode.exit();
+      this._uiModeNameStack.shift();
+      curModeName = this.getCurUiModeName();
+    }
     // curMode = this.getCurUiMode();
     // if (curMode !== null) {
     //   curMode.enter();
