@@ -105,6 +105,14 @@ Game.Map.prototype.getItems = function (x_or_pos,y) {
   return  [];
 };
 
+Game.Map.prototype.getEverything = function (x_or_pos,y) {
+  return {
+    'entity':this.getEntity(x_or_pos,y),
+    'items':this.getItems(x_or_pos,y),
+    'tile':this.getTile(x_or_pos,y)
+  };
+};
+
 Game.Map.prototype.getEntitiesNearby = function (radius,x_or_pos,y) {
   var useX = x_or_pos,useY=y;
   if (typeof x_or_pos == 'object') {
@@ -214,7 +222,7 @@ Game.Map.prototype.renderOn = function (display,camX,camY,renderOptions) { //vis
   var showMaskedEntities = (opt.showMaskedEntities !== undefined) ? opt.showMaskedEntities : false;
   var showMaskedItems = (opt.showMaskedItems !== undefined) ? opt.showMaskedItems : false;
   var showMaskedTiles = (opt.showMaskedTiles !== undefined) ? opt.showMaskedTiles : true;
-
+  var cursorPos = (opt.cursorPos !== undefined) ? opt.cursorPos : false;
 
   if (! (showVisibleEntities || showVisibleTiles || showMaskedEntities || showMaskedTiles)) { return; }
 
@@ -227,6 +235,11 @@ Game.Map.prototype.renderOn = function (display,camX,camY,renderOptions) { //vis
       var mapCoord = mapPos.x+','+mapPos.y;
 
       if (! ((checkCellsVisible && visibleCells[mapCoord]) || (checkCellsMasked && maskedCells[mapCoord]))) {
+        continue;
+      }
+
+      if (cursorPos && cursorPos.x==mapPos.x && cursorPos.y==mapPos.y) {
+        Game.Symbol.TARGET_CURSOR.draw(display,x,y);
         continue;
       }
 

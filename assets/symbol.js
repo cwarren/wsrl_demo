@@ -36,5 +36,5 @@ Game.Symbol.prototype.draw = function (display,disp_x,disp_y,isMasked) {
 
 Game.Symbol.NULL_SYMBOL = new Game.Symbol();
 Game.Symbol.AVATAR = new Game.Symbol({chr:'@',fg:'#dda'});
-
+Game.Symbol.TARGET_CURSOR = new Game.Symbol({chr:'*',fg:'#0f1'});
 Game.Symbol.ITEM_PILE = new Game.Symbol({chr:'&',fg:'#dcc'});

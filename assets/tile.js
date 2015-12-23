@@ -27,6 +27,10 @@ Game.Tile.prototype.isTransparent = function () {
   return this.attr._transparent;
 };
 
+Game.Tile.prototype.getDescription = function () {
+  return "This "+this.getName()+" "+(this.isWalkable() ? 'is walkable' : 'is not walkable')+", "+(this.isDiggable() ? 'can be dug out' : 'cannot be dug out')+", and "+(this.isOpaque() ? 'is opaque' : 'is transparent');
+};
+
 //-----------------------------------------------------------------------------
 
 Game.Tile.nullTile = new Game.Tile({name:'nullTile'});

@@ -36,3 +36,10 @@ The plan is:
 - send message to player about whatever is under the cursor (entity, item pile, item, tile)
 
 Maybe approach targeting similar to itemListing - it's general functionality that comes up for a lot of game mechanics, so consider a base ui mode which is customized via template for particular uses.
+
+1. key binding for action
+2. handleInput for action
+3. new UIMode base
+4. mode details
+5. user experience tweaking
+6. persistence (not really needed for this, since can't access the persistence mode from targeting mode to do a save)

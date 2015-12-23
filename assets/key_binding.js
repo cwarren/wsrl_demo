@@ -164,7 +164,7 @@ Game.KeyBinding = {
 
     MOVE_UL   : {action_group:'base_movement' ,guid:Game.util.uniqueId() ,ordering:3 ,short:'move' ,long :'move diagonally up and to the left',
       numpad: {label:'7' ,inputMatch:ROT.VK_NUMPAD7 ,inputType:'keydown' ,inputMetaShift:false ,inputMetaCtrl:false} ,
-      waxd  : {label:'q' ,inputMatch:ROT.VK_Q       ,inputType:'keydown' ,inputMetaShift:false ,inputMetaCtrl:false}
+      waxd  : {label:'q' ,inputMatch:ROT.VK_Q       ,inputType:'keydown' ,inputMetaShift:false ,inputMetaCtrl:false},
     },
     MOVE_U    : {action_group:'base_movement' ,guid:Game.util.uniqueId() ,ordering:3 ,short:'move' ,long :'move straight up',
       numpad: {label:'8' ,inputMatch:ROT.VK_NUMPAD8 ,inputType:'keydown' ,inputMetaShift:false ,inputMetaCtrl:false} ,
@@ -225,6 +225,11 @@ Game.KeyBinding = {
       numpad: {label:'x' ,inputMatch:ROT.VK_X ,inputType:'keydown' ,inputMetaShift:false  ,inputMetaCtrl:false},
       waxd  : {label:'X' ,inputMatch:ROT.VK_X ,inputType:'keydown' ,inputMetaShift:true  ,inputMetaCtrl:false},
       LAYER_inventoryListing: {label:'x' ,inputMatch:ROT.VK_X ,inputType:'keydown' ,inputMetaShift:false  ,inputMetaCtrl:false}
+    },
+
+    LOOK : {action_group:'world' ,guid:Game.util.uniqueId() ,ordering:6.1 ,short:'look'  ,long :'move the cursor to look at something',
+      numpad: {label:'l' ,inputMatch:ROT.VK_L ,inputType:'keydown' ,inputMetaShift:false ,inputMetaCtrl:false} ,
+      waxd  : {label:'l' ,inputMatch:ROT.VK_L ,inputType:'keydown' ,inputMetaShift:false ,inputMetaCtrl:false}
     },
 
     DATA_NAV_UP   : {action_group:'data_nav' ,guid:Game.util.uniqueId() ,ordering:1.1 ,short:'up'   ,long :'scroll content up'   ,

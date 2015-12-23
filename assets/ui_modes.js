@@ -295,17 +295,18 @@ Game.UIMode.gamePlay = {
   setAvatar: function (a) {
     this.attr._avatarId = a.getId();
   },
-  render: function (display) {
-    var seenCells = this.getAvatar().getVisibleCells();
+  render: function (display,cursorPos_optional) {
+    var seenCells = Game.getAvatar().getVisibleCells();
     this.getMap().renderOn(display,this.attr._cameraX,this.attr._cameraY,{
       visibleCells:seenCells,
-      maskedCells:this.getAvatar().getRememberedCoordsForMap()
+      maskedCells:Game.getAvatar().getRememberedCoordsForMap(),
+      cursorPos: cursorPos_optional
       });
-    this.getAvatar().rememberCoords(seenCells);
+    Game.getAvatar().rememberCoords(seenCells);
   },
   renderAvatarInfo: function (display) {
     // feels like this should be encapsulated somewhere else, but I don't really know where - perhaps in the PlayerActor mixin?
-    var av = this.getAvatar();
+    var av = Game.getAvatar();
     var y = 0;
     y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"ATTACK");
     y += display.drawText(1,y,Game.UIMode.DEFAULT_COLOR_STR+"Accuracy: "+av.getAttackHit());
@@ -324,8 +325,8 @@ Game.UIMode.gamePlay = {
   },
   moveAvatar: function (pdx,pdy) {
     // console.log('moveAvatar '+pdx+','+pdy);
-    var moveResp = this.getAvatar().raiseSymbolActiveEvent('adjacentMove',{dx:pdx,dy:pdy});
-    // if (this.getAvatar().tryWalk(this.getMap(),dx,dy)) {
+    var moveResp = Game.getAvatar().raiseSymbolActiveEvent('adjacentMove',{dx:pdx,dy:pdy});
+    // if (Game.getAvatar().tryWalk(this.getMap(),dx,dy)) {
     if (moveResp.madeAdjacentMove && moveResp.madeAdjacentMove[0]) {
       this.setCameraToAvatar();
       return true;
@@ -341,7 +342,7 @@ Game.UIMode.gamePlay = {
     //Game.renderDisplayMain();
   },
   setCameraToAvatar: function () {
-    this.setCamera(this.getAvatar().getX(),this.getAvatar().getY());
+    this.setCamera(Game.getAvatar().getX(),Game.getAvatar().getY());
   },
   handleInput: function (inputType,inputData) {
     // console.log(inputType);
@@ -378,9 +379,9 @@ Game.UIMode.gamePlay = {
     else if (actionBinding.actionKey == 'INVENTORY') {
       Game.addUiMode('LAYER_inventoryListing');
     } else if (actionBinding.actionKey == 'PICKUP') {
-      var pickUpList = Game.util.objectArrayToIdArray(this.getAvatar().getMap().getItems(this.getAvatar().getPos()));
+      var pickUpList = Game.util.objectArrayToIdArray(Game.getAvatar().getMap().getItems(Game.getAvatar().getPos()));
       if (pickUpList.length <= 1) {
-        var pickupRes = this.getAvatar().pickupItems(pickUpList);
+        var pickupRes = Game.getAvatar().pickupItems(pickUpList);
         tookTurn = pickupRes.numItemsPickedUp > 0;
       } else {
         Game.addUiMode('LAYER_inventoryPickup');
@@ -393,6 +394,10 @@ Game.UIMode.gamePlay = {
       Game.addUiMode('LAYER_inventoryExamine');
     }
 
+    else if (actionBinding.actionKey == 'LOOK') {
+     Game.addUiMode('LAYER_targetLook');
+    }
+
     else if (actionBinding.actionKey   == 'CHANGE_BINDINGS') {
       Game.KeyBinding.swapToNextKeyBinding();
     } else if (actionBinding.actionKey == 'PERSISTENCE') {
@@ -403,7 +408,7 @@ Game.UIMode.gamePlay = {
     }
 
     if (tookTurn) {
-      this.getAvatar().raiseSymbolActiveEvent('actionDone');
+      Game.getAvatar().raiseSymbolActiveEvent('actionDone');
       Game.Message.ageMessages();
       return true;
     }
@@ -413,7 +418,7 @@ Game.UIMode.gamePlay = {
     this.setMap(new Game.Map('caves1'));
     this.setAvatar(Game.EntityGenerator.create('avatar'));
 
-    this.getMap().addEntity(this.getAvatar(),this.getMap().getRandomWalkablePosition());
+    this.getMap().addEntity(Game.getAvatar(),this.getMap().getRandomWalkablePosition());
     this.setCameraToAvatar();
 
     ////////////////////////////////////////////////////
@@ -874,4 +879,95 @@ Game.UIMode.LAYER_inventoryEat = new Game.UIMode.LAYER_itemListing({
 });
 Game.UIMode.LAYER_inventoryEat.doSetup = function () {
   this.setup({itemIdList: Game.getAvatar().getInventoryItemIds()});
+};
+
+//#############################################################################
+//#############################################################################
+
+Game.UIMode.LAYER_targetLook = {
+  _cursorPos: {x:0,y:0},
+  enter: function () {
+    this._cursorPos = Game.getAvatar().getPos();
+    Game.refresh();
+    Game.specialMessage("use movement keys to move the cursor");
+  },
+  exit: function () {
+    setTimeout(function() {
+       Game.refresh();
+    }, 1);
+  },
+  render: function (display) {
+    // this.getMap().renderOn(display,this.attr._cameraX,this.attr._cameraY,{
+    //   visibleCells:Game.getAvatar().getVisibleCells(),
+    //   maskedCells:Game.getAvatar().getRememberedCoordsForMap()
+    //   });
+
+    Game.UIMode.gamePlay.render(display,this._cursorPos);
+    // Game.Symbol.TARGET_CURSOR.draw(display,this._cursorPos.x,this._cursorPos.y);
+  },
+  handleInput: function (inputType,inputData) {
+    // console.log(inputType);
+    // console.dir(inputData);
+    var actionBinding = Game.KeyBinding.getInputBinding(inputType,inputData);
+    // console.log('action binding is');
+    // console.dir(actionBinding);
+    // console.log('----------');
+    if (! actionBinding) {
+      return false;
+    }
+
+    if (actionBinding.actionKey == 'CANCEL') {
+      Game.removeUiMode();
+      return false;
+    }
+
+    var origCursorPos = {x:this._cursorPos.x,y:this._cursorPos.y};
+    if        (actionBinding.actionKey == 'MOVE_UL') {
+      this._cursorPos.x += -1;
+      this._cursorPos.y += -1;
+    } else if (actionBinding.actionKey == 'MOVE_U') {
+      this._cursorPos.x += 0;
+      this._cursorPos.y += -1;
+    } else if (actionBinding.actionKey == 'MOVE_UR') {
+      this._cursorPos.x += 1;
+      this._cursorPos.y += -1;
+    } else if (actionBinding.actionKey == 'MOVE_L') {
+      this._cursorPos.x += -1;
+      this._cursorPos.y += 0;
+    } else if (actionBinding.actionKey == 'MOVE_WAIT') {
+    } else if (actionBinding.actionKey == 'MOVE_R') {
+      this._cursorPos.x += 1;
+      this._cursorPos.y += 0;
+    } else if (actionBinding.actionKey == 'MOVE_DL') {
+      this._cursorPos.x += -1;
+      this._cursorPos.y += 1;
+    } else if (actionBinding.actionKey == 'MOVE_D') {
+      this._cursorPos.x += 0;
+      this._cursorPos.y += 1;
+    } else if (actionBinding.actionKey == 'MOVE_DR') {
+      this._cursorPos.x += 1;
+      this._cursorPos.y += 1;
+    }
+    if (! Game.getAvatar().canSeeCoord(this._cursorPos)) {
+      this._cursorPos = origCursorPos;
+      return false;
+    }
+    Game.renderDisplayMain();
+    var positionInfo = Game.getAvatar().getMap().getEverything(this._cursorPos);
+    console.dir(positionInfo);
+    var info = positionInfo.tile.getName()+' : '+positionInfo.tile.getDescription();
+    if (positionInfo.entity) {
+      info = positionInfo.entity.getName()+' : '+positionInfo.entity.getDescription();
+      if (positionInfo.items.length > 0) {
+        info += "\nIt's on top of at least one item.";
+      }
+    } else if (positionInfo.items.length > 0) {
+      info = positionInfo.items[0].getDetailedDescription();
+      if (positionInfo.items.length > 1) {
+        info += "\nIt's at the top of a pile of "+positionInfo.items.length+" items.";
+      }
+    }
+    Game.specialMessage(info);
+    return false;
+  }
 };
