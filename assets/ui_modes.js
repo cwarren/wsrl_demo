@@ -886,12 +886,16 @@ Game.UIMode.LAYER_inventoryEat.doSetup = function () {
 
 Game.UIMode.LAYER_targetLook = {
   _cursorPos: {x:0,y:0},
+  _storedKeyBinding: '',
   enter: function () {
     this._cursorPos = Game.getAvatar().getPos();
+    this._storedKeyBinding = Game.KeyBinding.getKeyBinding();
+    Game.KeyBinding.setKeyBinding('target_'+Game.KeyBinding.getBaseBinding());
     Game.refresh();
     Game.specialMessage("use movement keys to move the cursor");
   },
   exit: function () {
+    Game.KeyBinding.setKeyBinding(this._storedKeyBinding);
     setTimeout(function() {
        Game.refresh();
     }, 1);
@@ -917,6 +921,10 @@ Game.UIMode.LAYER_targetLook = {
     }
 
     if (actionBinding.actionKey == 'CANCEL') {
+      Game.removeUiMode();
+      return false;
+    }
+    if (actionBinding.actionKey == 'ACT_ON_TARGET') {
       Game.removeUiMode();
       return false;
     }
@@ -947,7 +955,12 @@ Game.UIMode.LAYER_targetLook = {
     } else if (actionBinding.actionKey == 'MOVE_DR') {
       this._cursorPos.x += 1;
       this._cursorPos.y += 1;
+
+    } else if (actionBinding.actionKey == 'HELP') {
+      Game.UIMode.LAYER_textReading.setText(Game.KeyBinding.getBindingHelpText());
+      Game.addUiMode('LAYER_textReading');
     }
+
     if (! Game.getAvatar().canSeeCoord(this._cursorPos)) {
       this._cursorPos = origCursorPos;
       return false;
