@@ -10,14 +10,13 @@ Addendum: Which bites are taken when is key to success.
 
 Some of the tasks that would need to be done for a full game aren't really necessary for a base game, so I'm (at least for now) setting them aside. I'm also far enough along that I'm going to put a bit of thought into ordering the milestone list at this point.
 Base game:
-- looking at things (targeting)
+- throwing things & ranged combat
 - equipment
 - improved map generation - random seeds for maps? seeding items? connected maps?
 - improved map persistence - saving the RNG state
 Later:
 - random tables (ways of selecting at random from a weighted and possibly dynamic set)
 - treasure drops
-- throwing things & ranged combat
 - map modification - digging
 - ongoing actions
 - avatar advancement - experience and improvement
@@ -27,19 +26,13 @@ Later:
 - improved combat mechanics
 - ipad compatibility (capturing input, figuring out key bindings)
 
-Looking at things is a fun step for game play because it really brings the world to life. On the code side we add a new ui mode that will support moving a cursor around and giving the player info about whatever the cursor is over/on. This will make more use of Sight mixin - the may expose some parts that need to be tweaked, or we may find it sufficient to our needs.
+Rather than diving right into equipment I want to extend the targeting stuff a bit more first. In addition to just looking at things I want to be able to throw rocks (and eventually other items) at enemies. This will require three main pieces. First, I need a new item listing to let the player choose which item to throw. Second once the item is selected I need to swap to a throw targeting mode to pick the space/entity to target. Third I need to implement the actual throw process - track from avatar to target, but stopping at the first non-walkable space encountered (e.g. hit an entity or wall that's in the way before getting to the intended target).
 
-The plan is:
-- ui mode layer for targeting
-- use one of the movement key bindings (numpad or waxd - which ever gamePlay is using) to move the cursor around, limited to avatar FoV
-- two rendering passes - first is delegated to gamePlay, second positions the targeting cursor
-- send message to player about whatever is under the cursor (entity, item pile, item, tile)
+Once those things are in place I need to figure out what it means for an entity to be hit by an item. This means in general setting up the base ranged combat mechanics, which will be similar to the melee mechanics. Items will need a projectile mixin for doing ranged damage. I need to think more about entity defense - melee defender may be generalized to combat defender or some such thing.
 
-Maybe approach targeting similar to itemListing - it's general functionality that comes up for a lot of game mechanics, so consider a base ui mode which is customized via template for particular uses.
-
-1. key binding for action
-2. handleInput for action
-3. new UIMode base
-4. mode details
-5. user experience tweaking
-6. persistence (not really needed for this, since can't access the persistence mode from targeting mode to do a save)
+A generalized targeting mode needs to parameterize:
+- targeting limit - can the cursor be moved to the next space (e.g. limit to visible spaces)
+- target action - what to do when the player acts on the given target (e.g. throw something at / to that target)
+- cursor info - what information to give the player about what's at the cursor's current positionInfo
+- maybe the cursor character...?
+- text to remind the player about what's going on (e.g. "throw the foo at...")
