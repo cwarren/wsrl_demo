@@ -901,13 +901,13 @@ Game.UIMode.LAYER_targetLook = {
     }, 1);
   },
   render: function (display) {
-    // this.getMap().renderOn(display,this.attr._cameraX,this.attr._cameraY,{
-    //   visibleCells:Game.getAvatar().getVisibleCells(),
-    //   maskedCells:Game.getAvatar().getRememberedCoordsForMap()
-    //   });
-
-    Game.UIMode.gamePlay.render(display,this._cursorPos);
-    // Game.Symbol.TARGET_CURSOR.draw(display,this._cursorPos.x,this._cursorPos.y);
+    // Game.UIMode.gamePlay.render(display,this._cursorPos);
+    var seenCells = Game.getAvatar().getVisibleCells();
+    Game.UIMode.gamePlay.getMap().renderOn(display,this._cursorPos.x,this._cursorPos.y,{
+      visibleCells:seenCells,
+      maskedCells:Game.getAvatar().getRememberedCoordsForMap(),
+      cursorPos: this._cursorPos
+      });
   },
   handleInput: function (inputType,inputData) {
     // console.log(inputType);
@@ -967,10 +967,10 @@ Game.UIMode.LAYER_targetLook = {
     }
     Game.renderDisplayMain();
     var positionInfo = Game.getAvatar().getMap().getEverything(this._cursorPos);
-    console.dir(positionInfo);
+    //console.dir(positionInfo);
     var info = positionInfo.tile.getName()+' : '+positionInfo.tile.getDescription();
     if (positionInfo.entity) {
-      info = positionInfo.entity.getName()+' : '+positionInfo.entity.getDescription();
+      info = positionInfo.entity.getDetailedDescription();
       if (positionInfo.items.length > 0) {
         info += "\nIt's on top of at least one item.";
       }
