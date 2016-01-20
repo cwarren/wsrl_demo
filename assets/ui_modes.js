@@ -914,6 +914,162 @@ Game.UIMode.LAYER_inventoryEat.doSetup = function () {
 //#############################################################################
 //#############################################################################
 
+//#############################################################################
+//#############################################################################
+
+Game.UIMode.LAYER_targeting = function(template) {
+  template = template ? template : {};
+
+  this._caption = template.caption || 'Choose target';
+  this._processingFunction = template.processingFunction || function (targetPos) { return false; };
+  this._targetBlockedFunction = template.targetBlockedFunction || function (targetPos) { return ! Game.getAvatar().canSeeCoord(targetPos); };
+  this._targetInfoFunction = template.targetInfoFunction || function(targetPos) {return '';};
+
+  this._cursorPos = {x:0,y:0};
+  this._storedKeyBinding = '';
+  this._keyBindingName= template.keyBindingName || 'target_'+Game.KeyBinding.getBaseBinding();
+};
+
+Game.UIMode.LAYER_targeting.prototype.enter = function () {
+  this.baseSetup();
+  this._storedKeyBinding = Game.KeyBinding.getKeyBinding();
+  Game.KeyBinding.setKeyBinding(this._keyBindingName);
+  if ('doSetup' in this) {
+    this.doSetup();
+  }
+  Game.refresh();
+  Game.specialMessage("use movement keys to move the targeting cursor");
+};
+Game.UIMode.LAYER_targeting.prototype.exit = function () {
+  Game.KeyBinding.setKeyBinding(this._storedKeyBinding);
+  setTimeout(function(){
+     Game.refresh();
+  }, 1);
+};
+Game.UIMode.LAYER_targeting.prototype.baseSetup = function(setupParams) {
+  setupParams = setupParams ? setupParams : {};
+  this._keyBindingName= setupParams.keyBindingName || 'target_'+Game.KeyBinding.getBaseBinding();
+  this._cursorPos = Game.getAvatar().getPos();
+};
+Game.UIMode.LAYER_targeting.prototype.getKeyBindingName = function () {
+  return this._keyBindingName;
+};
+Game.UIMode.LAYER_targeting.prototype.setKeyBindingName = function (keyBindingName) {
+  this._keyBindingName = keyBindingName;
+};
+Game.UIMode.LAYER_targeting.prototype.getCaptionText = function () {
+  var captionText = 'Fling/fire';
+  if (typeof this._caption == 'function') {
+    captionText = this._caption();
+  } else {
+    captionText = this._caption;
+  }
+  return captionText;
+};
+
+Game.UIMode.LAYER_targeting.prototype.executeProcessingFunction = function() {
+  console.log('start targeting layer executeProcessingFunction');
+  Game.removeUiModeAllLayers();
+
+  // Call the processing function and end the player's turn if it returns true.
+  if (this._processingFunction(this._cursorPos)) {
+    Game.getAvatar().raiseSymbolActiveEvent('actionDone');
+    setTimeout(function(){
+       Game.Message.ageMessages();
+    }, 1);
+  }
+};
+
+Game.UIMode.LAYER_targeting.prototype.render = function (display) {
+  var seenCells = Game.getAvatar().getVisibleCells();
+  Game.UIMode.gamePlay.getMap().renderOn(display,this._cursorPos.x,this._cursorPos.y,{
+    visibleCells:seenCells,
+    maskedCells:Game.getAvatar().getRememberedCoordsForMap(),
+    cursorPos: this._cursorPos
+    });
+};
+
+Game.UIMode.LAYER_targeting.prototype.handleInput = function (inputType,inputData) {
+  var actionBinding = Game.KeyBinding.getInputBinding(inputType,inputData);
+
+  if (actionBinding.actionKey == 'CANCEL') {
+    Game.removeUiMode();
+    return false;
+
+  } else if (actionBinding.actionKey == 'ACT_ON_TARGET') {
+    return this.executeProcessingFunction();
+
+  } else if (actionBinding.actionKey == 'HELP') {
+    Game.UIMode.LAYER_textReading.setText(Game.KeyBinding.getBindingHelpText());
+    Game.addUiMode('LAYER_textReading');
+    return false;
+  }
+
+  var origCursorPos = {x:this._cursorPos.x,y:this._cursorPos.y};
+  if        (actionBinding.actionKey == 'MOVE_UL') {
+    this._cursorPos.x += -1;
+    this._cursorPos.y += -1;
+  } else if (actionBinding.actionKey == 'MOVE_U') {
+    this._cursorPos.x += 0;
+    this._cursorPos.y += -1;
+  } else if (actionBinding.actionKey == 'MOVE_UR') {
+    this._cursorPos.x += 1;
+    this._cursorPos.y += -1;
+  } else if (actionBinding.actionKey == 'MOVE_L') {
+    this._cursorPos.x += -1;
+    this._cursorPos.y += 0;
+  } else if (actionBinding.actionKey == 'MOVE_WAIT') {
+  } else if (actionBinding.actionKey == 'MOVE_R') {
+    this._cursorPos.x += 1;
+    this._cursorPos.y += 0;
+  } else if (actionBinding.actionKey == 'MOVE_DL') {
+    this._cursorPos.x += -1;
+    this._cursorPos.y += 1;
+  } else if (actionBinding.actionKey == 'MOVE_D') {
+    this._cursorPos.x += 0;
+    this._cursorPos.y += 1;
+  } else if (actionBinding.actionKey == 'MOVE_DR') {
+    this._cursorPos.x += 1;
+    this._cursorPos.y += 1;
+  }
+
+  if (this._targetBlockedFunction(this._cursorPos)) {
+    this._cursorPos = origCursorPos;
+    return false;
+  }
+  Game.renderDisplayMain();
+  var info = this._targetInfoFunction(this._cursorPos);
+  if (info) {
+    Game.specialMessage(info);
+  }
+  return false;
+
+};
+
+//-------------------
+
+Game.UIMode.LAYER_targetLook = new Game.UIMode.LAYER_targeting({
+  caption: 'Look at',
+  targetInfoFunction: function(targetPos) {
+    var positionInfo = Game.getAvatar().getMap().getEverything(targetPos);
+    //console.dir(positionInfo);
+    var info = positionInfo.tile.getName()+' : '+positionInfo.tile.getDescription();
+    if (positionInfo.entity) {
+      info = positionInfo.entity.getDetailedDescription();
+      if (positionInfo.items.length > 0) {
+        info += "\nIt's on top of at least one item.";
+      }
+    } else if (positionInfo.items.length > 0) {
+      info = positionInfo.items[0].getDetailedDescription();
+      if (positionInfo.items.length > 1) {
+        info += "\nIt's at the top of a pile of "+positionInfo.items.length+" items.";
+      }
+    }
+    return info;
+  }
+});
+
+/*
 Game.UIMode.LAYER_targetLook = {
   _cursorPos: {x:0,y:0},
   _storedKeyBinding: '',
@@ -1014,3 +1170,4 @@ Game.UIMode.LAYER_targetLook = {
     return false;
   }
 };
+*/
