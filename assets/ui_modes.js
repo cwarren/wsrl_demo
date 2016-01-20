@@ -388,6 +388,9 @@ Game.UIMode.gamePlay = {
       }
     } else if (actionBinding.actionKey == 'DROP') {
       Game.addUiMode('LAYER_inventoryDrop');
+    } else if (actionBinding.actionKey == 'FLING') {
+      console.log('fling action');
+      Game.addUiMode('LAYER_inventoryFling');
     } else if (actionBinding.actionKey == 'EAT') {
       Game.addUiMode('LAYER_inventoryEat');
     } else if (actionBinding.actionKey == 'EXAMINE') {
@@ -794,6 +797,11 @@ Game.UIMode.LAYER_inventoryListing.handleInput = function (inputType,inputData) 
       Game.addUiMode('LAYER_inventoryDrop');
       return false;
     }
+    if (actionBinding.actionKey == 'FLING') {
+      console.log('fling action from inventory listing');
+      Game.addUiMode('LAYER_inventoryFling');
+      return false;
+    }
     if (actionBinding.actionKey == 'EAT') {
       Game.addUiMode('LAYER_inventoryEat');
       return false;
@@ -818,6 +826,28 @@ Game.UIMode.LAYER_inventoryDrop = new Game.UIMode.LAYER_itemListing({
     }
 });
 Game.UIMode.LAYER_inventoryDrop.doSetup = function () {
+  this.setup({itemIdList: Game.getAvatar().getInventoryItemIds()});
+};
+
+//-------------------
+
+Game.UIMode.LAYER_inventoryFling = new Game.UIMode.LAYER_itemListing({
+    caption: 'Choose item to fling/fire',
+    canSelect: true,
+    canSelectMultipleItems: false,
+    keyBindingName: 'LAYER_inventoryFling',
+    processingFunction: function (selectedItemIds) {
+      if (selectedItemIds.length < 1) {
+        console.log("no item to fling");
+        return false;
+      }
+      //var dropResult = Game.getAvatar().dropItems(selectedItemIds);
+      console.log("flinging item "+selectedItemIds[0]);
+      return false;
+//      return dropResult.numItemsDropped > 0;
+    }
+});
+Game.UIMode.LAYER_inventoryFling.doSetup = function () {
   this.setup({itemIdList: Game.getAvatar().getInventoryItemIds()});
 };
 

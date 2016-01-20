@@ -246,6 +246,11 @@ Game.KeyBinding = {
       waxd  : {label:'D' ,inputMatch:ROT.VK_D ,inputType:'keydown' ,inputMetaShift:true  ,inputMetaCtrl:false},
       LAYER_inventoryListing: {label:'d' ,inputMatch:ROT.VK_D ,inputType:'keydown' ,inputMetaShift:false  ,inputMetaCtrl:false}
     },
+    FLING : {action_group:'inventory' ,guid:Game.util.uniqueId() ,ordering:5.25 ,short:'fire/fling' ,long :'fire/fling an item',
+      numpad: {label:'f' ,inputMatch:ROT.VK_F ,inputType:'keydown' ,inputMetaShift:false  ,inputMetaCtrl:false} ,
+      waxd  : {label:'f' ,inputMatch:ROT.VK_F ,inputType:'keydown' ,inputMetaShift:false  ,inputMetaCtrl:false},
+      LAYER_inventoryListing: {label:'f' ,inputMatch:ROT.VK_F ,inputType:'keydown' ,inputMetaShift:false  ,inputMetaCtrl:false}
+    },
     EAT   : {action_group:'inventory' ,guid:Game.util.uniqueId() ,ordering:5.3 ,short:'eat' ,long :'consume food to reduce hunger'         ,
       numpad: {label:'E' ,inputMatch:ROT.VK_E ,inputType:'keydown' ,inputMetaShift:true  ,inputMetaCtrl:false} ,
       waxd  : {label:'E' ,inputMatch:ROT.VK_E ,inputType:'keydown' ,inputMetaShift:true  ,inputMetaCtrl:false},
